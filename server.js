@@ -14,10 +14,38 @@ const upload = multer({ dest: 'uploads/' });
 const app = express();
 const port = process.env.PORT || 3000;
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+// Verifica se as variáveis de ambiente do Supabase estão definidas
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+  console.error('❌ Erro: SUPABASE_URL e SUPABASE_KEY devem estar definidos no arquivo .env');
+  console.error('Por favor, clique no botão "Connect to Supabase" no canto superior direito para configurar o Supabase');
+  console.error('Ou configure manualmente as variáveis de ambiente no arquivo .env');
+  process.exit(1);
+}
+
+// Valida se a URL do Supabase é válida
+try {
+  new URL(process.env.SUPABASE_URL);
+} catch (error) {
+  console.error('❌ Erro: SUPABASE_URL inválida no arquivo .env');
+  console.error('A URL deve estar no formato: https://seu-projeto.supabase.co');
+  console.error('URL atual:', process.env.SUPABASE_URL);
+  console.error('Por favor, clique no botão "Connect to Supabase" no canto superior direito para configurar o Supabase');
+  process.exit(1);
+}
+
+// Cria o cliente Supabase apenas após validação
+let supabase;
+try {
+  supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+  );
+  console.log('✅ Conexão com Supabase estabelecida com sucesso');
+} catch (error) {
+  console.error('❌ Erro ao conectar com Supabase:', error.message);
+  console.error('Verifique se SUPABASE_URL e SUPABASE_KEY estão corretos no arquivo .env');
+  process.exit(1);
+}
 
 // Middleware
 app.use(express.static('public'));
