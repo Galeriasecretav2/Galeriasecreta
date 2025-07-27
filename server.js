@@ -14,36 +14,30 @@ const upload = multer({ dest: 'uploads/' });
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Verifica se as variáveis de ambiente do Supabase estão definidas
+// Verifica variáveis de ambiente
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
-  console.error('❌ Erro: SUPABASE_URL e SUPABASE_KEY devem estar definidos no arquivo .env');
-  console.error('Por favor, clique no botão "Connect to Supabase" no canto superior direito para configurar o Supabase');
-  console.error('Ou configure manualmente as variáveis de ambiente no arquivo .env');
+  console.error('❌ SUPABASE_URL e SUPABASE_KEY devem estar no .env');
   process.exit(1);
 }
 
-// Valida se a URL do Supabase é válida
+// Valida URL do Supabase
 try {
   new URL(process.env.SUPABASE_URL);
 } catch (error) {
-  console.error('❌ Erro: SUPABASE_URL inválida no arquivo .env');
-  console.error('A URL deve estar no formato: https://seu-projeto.supabase.co');
-  console.error('URL atual:', process.env.SUPABASE_URL);
-  console.error('Por favor, clique no botão "Connect to Supabase" no canto superior direito para configurar o Supabase');
+  console.error('❌ SUPABASE_URL inválida:', process.env.SUPABASE_URL);
   process.exit(1);
 }
 
-// Cria o cliente Supabase apenas após validação
+// Cria o cliente Supabase
 let supabase;
 try {
   supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_KEY
   );
-  console.log('✅ Conexão com Supabase estabelecida com sucesso');
+  console.log('✅ Conexão com Supabase OK');
 } catch (error) {
-  console.error('❌ Erro ao conectar com Supabase:', error.message);
-  console.error('Verifique se SUPABASE_URL e SUPABASE_KEY estão corretos no arquivo .env');
+  console.error('❌ Erro ao criar cliente Supabase:', error.message);
   process.exit(1);
 }
 
@@ -55,51 +49,69 @@ app.use(express.urlencoded({ extended: true }));
 // Rota de candidatura
 app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
   try {
-    console.log('📨 Recebido POST /api/candidatura');
+    console.log('📨 POST /api/candidatura');
     const { nome, idade, pais, provincia, email, whatsapp } = req.body;
     const foto = req.file;
 
-    console.log('📄 Dados:', req.body);
+    console.log('📄 Dados recebidos:', req.body);
     console.log('🖼️ Foto:', foto);
 
     if (!nome || !idade || !email || !whatsapp) {
       return res.status(400).json({ error: 'Campos obrigatórios ausentes' });
     }
 
-    // Upload da imagem para Supabase Storage
+    // Upload da imagem
     let foto_url = null;
     let foto_path = null;
     let foto_nome = null;
 
     if (foto) {
-      const ext = path.extname(foto.originalname);
-      foto_nome = foto.originalname;
-      foto_path = `fotos/${Date.now()}_${foto_nome}`;
-      const fileBuffer = fs.readFileSync(foto.path);
+      try {
+        const ext = path.extname(foto.originalname);
+        foto_nome = foto.originalname;
+        foto_path = `fotos/${Date.now()}_${foto_nome}`;
+        const fileBuffer = fs.readFileSync(foto.path);
 
-      const { error: uploadError } = await supabase.storage
-        .from('candidaturas-fotos')
-        .upload(foto_path, fileBuffer, {
-          contentType: mime.lookup(ext) || 'image/jpeg',
+        console.log("📤 Enviando imagem...");
+        console.log("🧾 Nome:", foto_nome);
+        console.log("📁 Caminho:", foto_path);
+        console.log("🧠 MIME:", mime.lookup(ext));
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('candidaturas-fotos')
+          .upload(foto_path, fileBuffer, {
+            contentType: mime.lookup(ext) || 'image/jpeg',
+            upsert: false,
+          });
+
+        // Remove arquivo local
+        fs.unlinkSync(foto.path);
+
+        if (uploadError) {
+          console.error('❌ Erro ao enviar imagem:', uploadError.message);
+          return res.status(500).json({
+            error: 'Erro ao enviar imagem',
+            detalhes: uploadError.message,
+          });
+        }
+
+        console.log('✅ Upload OK:', uploadData);
+
+        const { data: publicUrlData } = supabase.storage
+          .from('candidaturas-fotos')
+          .getPublicUrl(foto_path);
+
+        foto_url = publicUrlData?.publicUrl;
+      } catch (uploadException) {
+        console.error('❌ Exceção ao enviar imagem:', uploadException);
+        return res.status(500).json({
+          error: 'Erro ao enviar imagem',
+          detalhes: uploadException.message,
         });
-
-      // Remove o arquivo temporário local após upload
-      fs.unlinkSync(foto.path);
-
-      if (uploadError) {
-        console.error('❌ Erro ao enviar imagem:', uploadError.message);
-        return res.status(500).json({ error: 'Erro ao enviar imagem' });
       }
-
-      // URL pública da imagem
-      const { data: publicUrlData } = supabase.storage
-        .from('candidaturas-fotos')
-        .getPublicUrl(foto_path);
-
-      foto_url = publicUrlData?.publicUrl;
     }
 
-    // Insere dados no banco
+    // Inserção no banco
     const { data, error } = await supabase.from('candidaturas').insert([
       {
         nome,
@@ -118,15 +130,21 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
     ]);
 
     if (error) {
-      console.error('❌ Erro ao salvar no Supabase:', error.message);
-      return res.status(500).json({ error: 'Erro ao salvar candidatura', detalhes: error.message });
+      console.error('❌ Erro ao salvar candidatura:', error.message);
+      return res.status(500).json({
+        error: 'Erro ao salvar candidatura',
+        detalhes: error.message,
+      });
     }
 
     console.log('✅ Candidatura salva com sucesso');
-    res.status(200).json({ message: 'Candidatura enviada com sucesso!', data });
+    return res.status(200).json({
+      message: 'Candidatura enviada com sucesso!',
+      data,
+    });
   } catch (err) {
-    console.error('❌ Erro inesperado:', err.message);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    console.error('❌ Erro geral:', err.message, err);
+    return res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
 
@@ -137,5 +155,5 @@ app.get('/', (req, res) => {
 
 // Inicia o servidor
 app.listen(port, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${port}`);
+  console.log(`🚀 Servidor ativo em http://localhost:${port}`);
 });
