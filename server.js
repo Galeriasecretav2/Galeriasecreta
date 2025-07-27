@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const mime = require('mime-types');
-const bcrypt = require('bcrypt');
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
@@ -54,10 +53,14 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
     const { nome, idade, pais, provincia, email, whatsapp } = req.body;
     const foto = req.file;
 
+    console.log('📄 Dados recebidos:', req.body);
+    console.log('🖼️ Foto:', foto);
+
     if (!nome || !idade || !email || !whatsapp) {
       return res.status(400).json({ error: 'Campos obrigatórios ausentes' });
     }
 
+    // Upload da imagem
     let foto_url = null;
     let foto_path = null;
     let foto_nome = null;
@@ -69,6 +72,11 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
         foto_path = `fotos/${Date.now()}_${foto_nome}`;
         const fileBuffer = fs.readFileSync(foto.path);
 
+        console.log("📤 Enviando imagem...");
+        console.log("🧾 Nome:", foto_nome);
+        console.log("📁 Caminho:", foto_path);
+        console.log("🧠 MIME:", mime.lookup(ext));
+
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('candidaturas-fotos')
           .upload(foto_path, fileBuffer, {
@@ -76,14 +84,18 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
             upsert: false,
           });
 
+        // Remove arquivo local
         fs.unlinkSync(foto.path);
 
         if (uploadError) {
+          console.error('❌ Erro ao enviar imagem:', uploadError.message);
           return res.status(500).json({
             error: 'Erro ao enviar imagem',
             detalhes: uploadError.message,
           });
         }
+
+        console.log('✅ Upload OK:', uploadData);
 
         const { data: publicUrlData } = supabase.storage
           .from('candidaturas-fotos')
@@ -91,6 +103,7 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
 
         foto_url = publicUrlData?.publicUrl;
       } catch (uploadException) {
+        console.error('❌ Exceção ao enviar imagem:', uploadException);
         return res.status(500).json({
           error: 'Erro ao enviar imagem',
           detalhes: uploadException.message,
@@ -98,6 +111,7 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
       }
     }
 
+    // Inserção no banco
     const { data, error } = await supabase.from('candidaturas').insert([
       {
         nome,
@@ -116,87 +130,21 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
     ]);
 
     if (error) {
+      console.error('❌ Erro ao salvar candidatura:', error.message);
       return res.status(500).json({
         error: 'Erro ao salvar candidatura',
         detalhes: error.message,
       });
     }
 
+    console.log('✅ Candidatura salva com sucesso');
     return res.status(200).json({
       message: 'Candidatura enviada com sucesso!',
       data,
     });
   } catch (err) {
+    console.error('❌ Erro geral:', err.message, err);
     return res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
-
-// 🔐 Cadastro de perfil
-app.post('/api/registrar', async (req, res) => {
-  const { nome, email, senha } = req.body;
-
-  if (!nome || !email || !senha) {
-    return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
-  }
-
-  try {
-    const { data: existingUser, error: selectError } = await supabase
-      .from('perfis')
-      .select('id')
-      .eq('email', email)
-      .single();
-
-    if (existingUser) {
-      return res.status(409).json({ error: 'Email já cadastrado.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(senha, 10);
-
-    const { data, error } = await supabase.from('perfis').insert([
-      {
-        nome,
-        email,
-        senha: hashedPassword,
-        criado_em: new Date().toISOString(),
-      },
-    ]);
-
-    if (error) throw error;
-
-    res.status(201).json({ message: 'Usuário registrado com sucesso!' });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao registrar usuário.' });
-  }
-});
-
-// 🔑 Login de perfil
-app.post('/api/login', async (req, res) => {
-  const { email, senha } = req.body;
-
-  if (!email || !senha) {
-    return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
-  }
-
-  try {
-    const { data: user, error } = await supabase
-      .from('perfis')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    if (error || !user) {
-      return res.status(401).json({ error: 'Email ou senha incorretos.' });
-    }
-
-    const valid = await bcrypt.compare(senha, user.senha);
-
-    if (!valid) {
-      return res.status(401).json({ error: 'Email ou senha incorretos.' });
-    }
-
-    res.status(200).json({ message: 'Login bem-sucedido', perfil: user });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao fazer login.' });
   }
 });
 
