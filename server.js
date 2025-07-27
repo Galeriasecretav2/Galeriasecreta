@@ -14,6 +14,13 @@ const upload = multer({ dest: 'uploads/' });
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Verifica se as variáveis de ambiente do Supabase estão definidas
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+  console.error('❌ Erro: SUPABASE_URL e SUPABASE_KEY devem estar definidos no arquivo .env');
+  console.error('Por favor, configure as variáveis de ambiente do Supabase no arquivo .env');
+  process.exit(1);
+}
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
