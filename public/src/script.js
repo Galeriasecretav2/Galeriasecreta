@@ -792,14 +792,6 @@ async function handleSignupSubmit(e) {
         return;
     }
     
-    // Check if passwords match
-    const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('signup-confirm-password').value;
-    
-    if (password !== confirmPassword) {
-        showFieldError(document.getElementById('signup-confirm-password'), 'As palavras-passe não coincidem.');
-        return;
-    }
 
     const submitBtn = form.querySelector('.btn');
     const btnText = submitBtn.querySelector('.btn-text');
@@ -810,15 +802,56 @@ async function handleSignupSubmit(e) {
     submitBtn.disabled = true;
 
     try {
-        // Simulate signup process
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Coletar dados do formulário
+        const formData = new FormData(form);
+        const inscricaoData = {
+            nome: formData.get('nome'),
+            email: formData.get('email'),
+            telefone: formData.get('telefone'),
+            data_nascimento: formData.get('data_nascimento'),
+            genero: formData.get('genero'),
+            cidade: formData.get('cidade'),
+            provincia: formData.get('provincia'),
+            profissao: formData.get('profissao'),
+            experiencia_anterior: formData.get('experiencia_anterior') === 'on',
+            motivacao: formData.get('motivacao'),
+            disponibilidade: formData.get('disponibilidade'),
+            termos_aceitos: formData.get('termos_aceitos') === 'on',
+            newsletter: formData.get('newsletter') === 'on'
+        };
+
+        console.log('Enviando dados de inscrição:', inscricaoData);
+
+        // Enviar para o servidor
+        const response = await fetchWithRetry('/api/inscricao', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(inscricaoData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            showNotification('✅ Inscrição realizada com sucesso! Entraremos em contacto em breve.', 'success');
+            closeModal(signupModal);
+            form.reset();
+            clearFormErrors(form);
+        } else {
+            throw new Error(result.detalhes || result.error || 'Erro desconhecido');
+        }
         
-        showNotification('Conta criada com sucesso! Bem-vindo à Galeria Secreta!', 'success');
-        closeModal(signupModal);
-        form.reset();
-        clearFormErrors(form);
     } catch (error) {
-        showNotification('Erro ao criar conta: ' + error.message, 'error');
+        console.error('Erro na inscrição:', error);
+        
+        if (error.message.includes('Email já cadastrado')) {
+            showFieldError(document.getElementById('signup-email'), 'Este email já está registrado em nosso sistema.');
+        } else if (error.message.includes('Idade insuficiente')) {
+            showFieldError(document.getElementById('signup-data-nascimento'), 'É necessário ter pelo menos 18 anos para se inscrever.');
+        } else {
+            showNotification('❌ Erro ao enviar inscrição: ' + error.message, 'error');
+        }
     } finally {
         btnText.style.display = 'inline';
         btnLoader.style.display = 'none';
@@ -1032,6 +1065,31 @@ function validateField(event) {
                     isValid = false;
                     errorMessage = 'O nome deve ter pelo menos 2 caracteres.';
                 }
+                if (field.name === 'cidade' && value.length < 2) {
+                    isValid = false;
+                    errorMessage = 'A cidade deve ter pelo menos 2 caracteres.';
+                }
+                break;
+            
+            case 'date':
+                if (field.name === 'data_nascimento') {
+                    const birthDate = new Date(value);
+                    const today = new Date();
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
+                    
+                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    
+                    if (age < 18) {
+                        isValid = false;
+                        errorMessage = 'É necessário ter pelo menos 18 anos.';
+                    } else if (age > 80) {
+                        isValid = false;
+                        errorMessage = 'Idade máxima permitida é 80 anos.';
+                    }
+                }
                 break;
         }
 
@@ -1041,6 +1099,12 @@ function validateField(event) {
                 isValid = false;
                 errorMessage = 'Por favor, forneça uma descrição mais detalhada (mínimo 10 caracteres).';
             }
+        }
+        
+        // Select validation
+        if (field.tagName === 'SELECT' && field.hasAttribute('required') && !value) {
+            isValid = false;
+            errorMessage = 'Por favor, selecione uma opção.';
         }
     }
 
@@ -1052,18 +1116,12 @@ function validateField(event) {
 
     // Checkbox validation
     if (field.type === 'checkbox' && field.hasAttribute('required') && !field.checked) {
-        isValid = false;
-        errorMessage = 'Deve concordar com os termos e condições.';
-    }
-    
-    // Password confirmation validation
-    if (field.name === 'confirmPassword') {
-        const passwordField = document.getElementById('signup-password');
-        if (passwordField && field.value !== passwordField.value) {
+        if (field.name === 'termos_aceitos') {
             isValid = false;
-            errorMessage = 'As palavras-passe não coincidem.';
+            errorMessage = 'Deve concordar com os termos e condições.';
         }
     }
+    
 
     if (!isValid) {
         showFieldError(field, errorMessage);

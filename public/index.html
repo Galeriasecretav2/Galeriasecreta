@@ -570,33 +570,134 @@
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="signup-title">Criar Conta</h3>
+                <h3 id="signup-title">Inscrever-se na Galeria Secreta</h3>
                 <button class="modal-close" id="signup-close" aria-label="Fechar modal">&times;</button>
             </div>
             
             <form class="modal-form" id="signup-form" novalidate>
                 <div class="form-group">
-                    <label for="signup-name">Nome Completo</label>
-                    <input type="text" id="signup-name" name="name" required autocomplete="name" aria-describedby="signup-name-error">
-                    <div id="signup-name-error" class="error-message" role="alert"></div>
+                    <label for="signup-nome">Nome Completo *</label>
+                    <input type="text" id="signup-nome" name="nome" required autocomplete="name" aria-describedby="signup-nome-error">
+                    <div id="signup-nome-error" class="error-message" role="alert"></div>
                 </div>
+                
                 <div class="form-group">
-                    <label for="signup-email">Email</label>
+                    <label for="signup-email">Email *</label>
                     <input type="email" id="signup-email" name="email" required autocomplete="email" aria-describedby="signup-email-error">
                     <div id="signup-email-error" class="error-message" role="alert"></div>
                 </div>
+                
                 <div class="form-group">
-                    <label for="signup-password">Palavra-passe</label>
-                    <input type="password" id="signup-password" name="password" required autocomplete="new-password" aria-describedby="signup-password-error">
-                    <div id="signup-password-error" class="error-message" role="alert"></div>
+                    <label for="signup-telefone">Telefone/WhatsApp *</label>
+                    <input type="tel" id="signup-telefone" name="telefone" required autocomplete="tel" aria-describedby="signup-telefone-error">
+                    <div id="signup-telefone-error" class="error-message" role="alert"></div>
                 </div>
+                
                 <div class="form-group">
-                    <label for="signup-confirm-password">Confirmar Palavra-passe</label>
-                    <input type="password" id="signup-confirm-password" name="confirmPassword" required autocomplete="new-password" aria-describedby="signup-confirm-password-error">
-                    <div id="signup-confirm-password-error" class="error-message" role="alert"></div>
+                    <label for="signup-data-nascimento">Data de Nascimento *</label>
+                    <input type="date" id="signup-data-nascimento" name="data_nascimento" required aria-describedby="signup-data-nascimento-error">
+                    <div id="signup-data-nascimento-error" class="error-message" role="alert"></div>
                 </div>
+                
+                <div class="form-group">
+                    <label for="signup-genero">Gênero *</label>
+                    <select id="signup-genero" name="genero" required aria-describedby="signup-genero-error">
+                        <option value="">Selecione...</option>
+                        <option value="feminino">Feminino</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                    <div id="signup-genero-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-cidade">Cidade *</label>
+                    <input type="text" id="signup-cidade" name="cidade" required aria-describedby="signup-cidade-error">
+                    <div id="signup-cidade-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-provincia">Província *</label>
+                    <select id="signup-provincia" name="provincia" required aria-describedby="signup-provincia-error">
+                        <option value="">Selecione...</option>
+                        <option value="cabo-delgado">Cabo Delgado</option>
+                        <option value="gaza">Gaza</option>
+                        <option value="inhambane">Inhambane</option>
+                        <option value="manica">Manica</option>
+                        <option value="maputo">Maputo</option>
+                        <option value="maputo-cidade">Maputo (Cidade)</option>
+                        <option value="nampula">Nampula</option>
+                        <option value="niassa">Niassa</option>
+                        <option value="sofala">Sofala</option>
+                        <option value="tete">Tete</option>
+                        <option value="zambezia">Zambézia</option>
+                    </select>
+                    <div id="signup-provincia-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-profissao">Profissão Atual</label>
+                    <input type="text" id="signup-profissao" name="profissao" aria-describedby="signup-profissao-error">
+                    <div id="signup-profissao-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-disponibilidade">Disponibilidade *</label>
+                    <select id="signup-disponibilidade" name="disponibilidade" required aria-describedby="signup-disponibilidade-error">
+                        <option value="">Selecione...</option>
+                        <option value="tempo_integral">Tempo Integral</option>
+                        <option value="meio_periodo">Meio Período</option>
+                        <option value="fins_semana">Fins de Semana</option>
+                        <option value="flexivel">Flexível</option>
+                    </select>
+                    <div id="signup-disponibilidade-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-motivacao">Motivação para se juntar à Galeria Secreta</label>
+                    <textarea id="signup-motivacao" name="motivacao" rows="3" placeholder="Conte-nos por que deseja fazer parte da nossa comunidade..." aria-describedby="signup-motivacao-error"></textarea>
+                    <div id="signup-motivacao-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="signup-experiencia" name="experiencia_anterior">
+                        <label for="signup-experiencia" class="checkbox-label">
+                            <div class="checkmark"></div>
+                        </label>
+                    </div>
+                    <label for="signup-experiencia" class="checkbox-text">
+                        Tenho experiência anterior como acompanhante ou modelo
+                    </label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="signup-newsletter" name="newsletter">
+                        <label for="signup-newsletter" class="checkbox-label">
+                            <div class="checkmark"></div>
+                        </label>
+                    </div>
+                    <label for="signup-newsletter" class="checkbox-text">
+                        Desejo receber newsletters e atualizações por email
+                    </label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="signup-termos" name="termos_aceitos" required>
+                        <label for="signup-termos" class="checkbox-label">
+                            <div class="checkmark"></div>
+                        </label>
+                    </div>
+                    <label for="signup-termos" class="checkbox-text">
+                        Concordo com os termos e condições e autorizo o tratamento dos meus dados pessoais *
+                    </label>
+                    <div id="signup-termos-error" class="error-message" role="alert"></div>
+                </div>
+                
                 <button type="submit" class="btn btn-primary">
-                    <span class="btn-text">Criar Conta</span>
+                    <span class="btn-text">Enviar Inscrição</span>
                     <div class="btn-loader" style="display: none;" aria-hidden="true"></div>
                     <div class="btn-shine"></div>
                 </button>

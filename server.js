@@ -148,6 +148,138 @@ app.post('/api/candidatura', upload.single('foto'), async (req, res) => {
   }
 });
 
+// Rota de inscrição
+app.post('/api/inscricao', async (req, res) => {
+  try {
+    console.log('📨 POST /api/inscricao');
+    const { 
+      nome, 
+      email, 
+      telefone, 
+      data_nascimento, 
+      genero, 
+      cidade, 
+      provincia, 
+      profissao, 
+      experiencia_anterior, 
+      motivacao, 
+      disponibilidade, 
+      termos_aceitos, 
+      newsletter 
+    } = req.body;
+
+    console.log('📄 Dados de inscrição recebidos:', req.body);
+
+    // Validação de campos obrigatórios
+    if (!nome || !email || !telefone || !data_nascimento || !genero || !cidade || !provincia || !disponibilidade) {
+      return res.status(400).json({ 
+        error: 'Campos obrigatórios ausentes',
+        detalhes: 'Nome, email, telefone, data de nascimento, gênero, cidade, província e disponibilidade são obrigatórios'
+      });
+    }
+
+    // Validação de idade mínima
+    const birthDate = new Date(data_nascimento);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      return res.status(400).json({
+        error: 'Idade insuficiente',
+        detalhes: 'É necessário ter pelo menos 18 anos para se inscrever'
+      });
+    }
+
+    // Inserção no banco
+    const { data, error } = await supabase.from('inscricoes').insert([
+      {
+        nome,
+        email,
+        telefone,
+        data_nascimento,
+        genero,
+        cidade,
+        provincia,
+        profissao: profissao || '',
+        experiencia_anterior: experiencia_anterior || false,
+        motivacao: motivacao || '',
+        disponibilidade,
+        termos_aceitos: termos_aceitos || true,
+        newsletter: newsletter || false,
+        status: 'pendente',
+        observacoes: '',
+      },
+    ]);
+
+    if (error) {
+      console.error('❌ Erro ao salvar inscrição:', error.message);
+      
+      // Tratamento específico para email duplicado
+      if (error.code === '23505' && error.message.includes('email')) {
+        return res.status(409).json({
+          error: 'Email já cadastrado',
+          detalhes: 'Este email já está registrado em nosso sistema'
+        });
+      }
+      
+      return res.status(500).json({
+        error: 'Erro ao salvar inscrição',
+        detalhes: error.message,
+      });
+    }
+
+    console.log('✅ Inscrição salva com sucesso');
+    return res.status(200).json({
+      message: 'Inscrição realizada com sucesso!',
+      data,
+    });
+  } catch (err) {
+    console.error('❌ Erro geral na inscrição:', err.message, err);
+    return res.status(500).json({ 
+      error: 'Erro interno do servidor',
+      detalhes: err.message 
+    });
+  }
+});
+
+// Rota para listar inscrições (apenas para usuários autenticados)
+app.get('/api/inscricoes', async (req, res) => {
+  try {
+    console.log('📨 GET /api/inscricoes');
+    
+    const { data, error } = await supabase
+      .from('inscricoes')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ Erro ao buscar inscrições:', error.message);
+      return res.status(500).json({
+        error: 'Erro ao buscar inscrições',
+        detalhes: error.message,
+      });
+    }
+
+    console.log(`✅ ${data.length} inscrições encontradas`);
+    return res.status(200).json({
+      message: 'Inscrições recuperadas com sucesso',
+      data,
+      total: data.length
+    });
+  } catch (err) {
+    console.error('❌ Erro geral ao buscar inscrições:', err.message, err);
+    return res.status(500).json({ 
+      error: 'Erro interno do servidor',
+      detalhes: err.message 
+    });
+  }
+});
+
 // Página principal
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
