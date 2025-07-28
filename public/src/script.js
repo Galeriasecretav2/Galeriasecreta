@@ -32,6 +32,8 @@ let isSubmitting = false;
 let formData = {};
 let galleryVisible = false;
 let profilesData = {};
+let currentUser = null;
+let authToken = localStorage.getItem('authToken');
 
 // Enhanced Navigation functionality
 document.addEventListener('DOMContentLoaded', function() {
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
+    checkAuthStatus();
     setupEventListeners();
     setupFormValidation();
     setupIntersectionObserver();
@@ -53,6 +56,100 @@ function initializeApp() {
     setTimeout(() => {
         document.body.classList.add('loaded');
     }, 100);
+}
+
+// Função para verificar status de autenticação
+async function checkAuthStatus() {
+    if (!authToken) {
+        updateAuthUI(false);
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/verify-token', {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            currentUser = data.usuario;
+            updateAuthUI(true);
+        } else {
+            // Token inválido
+            localStorage.removeItem('authToken');
+            authToken = null;
+            updateAuthUI(false);
+        }
+    } catch (error) {
+        console.error('Erro ao verificar token:', error);
+        updateAuthUI(false);
+    }
+}
+
+// Função para atualizar UI baseada no status de auth
+function updateAuthUI(isLoggedIn) {
+    const loginBtn = document.getElementById('login-btn');
+    const signupBtn = document.getElementById('signup-btn');
+    
+    if (isLoggedIn && currentUser) {
+        // Usuário logado
+        if (loginBtn) {
+            loginBtn.innerHTML = `
+                <span class="action-icon">👤</span>
+                <span>${currentUser.nome}</span>
+            `;
+            loginBtn.onclick = showUserMenu;
+        }
+        
+        if (signupBtn) {
+            signupBtn.innerHTML = '<span>Sair</span>';
+            signupBtn.onclick = logout;
+        }
+    } else {
+        // Usuário não logado
+        if (loginBtn) {
+            loginBtn.innerHTML = `
+                <span class="action-icon">👤</span>
+                <span>Login</span>
+            `;
+            loginBtn.onclick = () => openModal(loginModal);
+        }
+        
+        if (signupBtn) {
+            signupBtn.innerHTML = '<span>Escreva-se</span>';
+            signupBtn.onclick = () => openModal(signupModal);
+        }
+    }
+}
+
+// Função para mostrar menu do usuário (placeholder)
+function showUserMenu() {
+    // Implementar menu dropdown do usuário
+    console.log('Menu do usuário:', currentUser);
+}
+
+// Função para logout
+async function logout() {
+    try {
+        if (authToken) {
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Erro no logout:', error);
+    } finally {
+        localStorage.removeItem('authToken');
+        authToken = null;
+        currentUser = null;
+        updateAuthUI(false);
+        showNotification('Logout realizado com sucesso!', 'success');
+    }
 }
 
 function setupEventListeners() {
@@ -501,16 +598,22 @@ function openImageFullscreen(imageUrl, modelName) {
 
 function setupModalEvents() {
     // Login modal
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => openModal(loginModal));
-    }
-    if (loginClose) {
+    if (loginModal && loginClose) {
         loginClose.addEventListener('click', () => closeModal(loginModal));
+        
+        if (loginForm) {
+            loginForm.addEventListener('submit', handleLogin);
+        }
     }
     
     // Signup modal
-    if (signupClose) {
+    if (signupModal && signupClose) {
         signupClose.addEventListener('click', () => closeModal(signupModal));
+        
+        const signupForm = document.getElementById('signup-form');
+        if (signupForm) {
+            signupForm.addEventListener('submit', handleSignup);
+        }
     }
 
     // Support modal
@@ -549,6 +652,135 @@ function setupModalEvents() {
             });
         }
     });
+}
+
+// Handler para login
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoader = submitBtn.querySelector('.btn-loader');
+    
+    // Mostrar loading
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: formData.get('email'),
+                senha: formData.get('password')
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Login bem-sucedido
+            authToken = data.token;
+            currentUser = data.usuario;
+            localStorage.setItem('authToken', authToken);
+            
+            closeModal(loginModal);
+            updateAuthUI(true);
+            showNotification('Login realizado com sucesso!', 'success');
+            form.reset();
+        } else {
+            // Erro no login
+            showNotification(data.error || 'Erro no login', 'error');
+        }
+    } catch (error) {
+        console.error('Erro no login:', error);
+        showNotification('Erro de conexão. Tente novamente.', 'error');
+    } finally {
+        // Esconder loading
+        btnText.style.display = 'block';
+        btnLoader.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+}
+
+// Handler para signup (registro)
+async function handleSignup(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoader = submitBtn.querySelector('.btn-loader');
+    
+    // Validar campos obrigatórios
+    const requiredFields = ['nome', 'email', 'telefone', 'data_nascimento', 'genero', 'cidade', 'provincia', 'disponibilidade'];
+    for (const field of requiredFields) {
+        if (!formData.get(field)) {
+            showNotification(`Campo ${field} é obrigatório`, 'error');
+            return;
+        }
+    }
+    
+    // Validar termos
+    if (!formData.get('termos_aceitos')) {
+        showNotification('Você deve aceitar os termos e condições', 'error');
+        return;
+    }
+    
+    // Mostrar loading
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/api/inscricao', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                telefone: formData.get('telefone'),
+                data_nascimento: formData.get('data_nascimento'),
+                genero: formData.get('genero'),
+                cidade: formData.get('cidade'),
+                provincia: formData.get('provincia'),
+                profissao: formData.get('profissao') || '',
+                experiencia_anterior: formData.get('experiencia_anterior') === 'on',
+                motivacao: formData.get('motivacao') || '',
+                disponibilidade: formData.get('disponibilidade'),
+                termos_aceitos: formData.get('termos_aceitos') === 'on',
+                newsletter: formData.get('newsletter') === 'on'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Inscrição bem-sucedida
+            closeModal(signupModal);
+            showNotification('Inscrição realizada com sucesso!', 'success');
+            form.reset();
+        } else {
+            // Erro na inscrição
+            showNotification(data.error || 'Erro na inscrição', 'error');
+        }
+    } catch (error) {
+        console.error('Erro na inscrição:', error);
+        showNotification('Erro de conexão. Tente novamente.', 'error');
+    } finally {
+        // Esconder loading
+        btnText.style.display = 'block';
+        btnLoader.style.display = 'none';
+        submitBtn.disabled = false;
+    }
 }
 
 function setupNavigationEvents() {
@@ -596,17 +828,6 @@ function setupFormEvents() {
     // Application form submission
     if (applicationForm) {
         applicationForm.addEventListener('submit', handleApplicationSubmit);
-    }
-
-    // Login form submission
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLoginSubmit);
-    }
-    
-    // Signup form submission
-    const signupForm = document.getElementById('signup-form');
-    if (signupForm) {
-        signupForm.addEventListener('submit', handleSignupSubmit);
     }
 
     // Photo upload functionality
@@ -751,114 +972,6 @@ async function handleApplicationSubmit(e) {
         setSubmitButtonState(false);
     }
 }
-
-async function handleLoginSubmit(e) {
-    e.preventDefault();
-    
-    if (!validateForm(loginForm)) {
-        return;
-    }
-
-    const submitBtn = loginForm.querySelector('.btn');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoader = submitBtn.querySelector('.btn-loader');
-    
-    btnText.style.display = 'none';
-    btnLoader.style.display = 'inline-block';
-    submitBtn.disabled = true;
-
-    try {
-        // Simulate login process
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        showNotification('Login realizado com sucesso!', 'success');
-        closeModal(loginModal);
-        loginForm.reset();
-        clearFormErrors(loginForm);
-    } catch (error) {
-        showNotification('Erro no login: ' + error.message, 'error');
-    } finally {
-        btnText.style.display = 'inline';
-        btnLoader.style.display = 'none';
-        submitBtn.disabled = false;
-    }
-}
-
-async function handleSignupSubmit(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    if (!validateForm(form)) {
-        return;
-    }
-    
-
-    const submitBtn = form.querySelector('.btn');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoader = submitBtn.querySelector('.btn-loader');
-    
-    btnText.style.display = 'none';
-    btnLoader.style.display = 'inline-block';
-    submitBtn.disabled = true;
-
-    try {
-        // Coletar dados do formulário
-        const formData = new FormData(form);
-        const inscricaoData = {
-            nome: formData.get('nome'),
-            email: formData.get('email'),
-            telefone: formData.get('telefone'),
-            data_nascimento: formData.get('data_nascimento'),
-            genero: formData.get('genero'),
-            cidade: formData.get('cidade'),
-            provincia: formData.get('provincia'),
-            profissao: formData.get('profissao'),
-            experiencia_anterior: formData.get('experiencia_anterior') === 'on',
-            motivacao: formData.get('motivacao'),
-            disponibilidade: formData.get('disponibilidade'),
-            termos_aceitos: formData.get('termos_aceitos') === 'on',
-            newsletter: formData.get('newsletter') === 'on'
-        };
-
-        console.log('Enviando dados de inscrição:', inscricaoData);
-
-        // Enviar para o servidor
-        const response = await fetchWithRetry('/api/inscricao', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(inscricaoData)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            showNotification('✅ Inscrição realizada com sucesso! Entraremos em contacto em breve.', 'success');
-            closeModal(signupModal);
-            form.reset();
-            clearFormErrors(form);
-        } else {
-            throw new Error(result.detalhes || result.error || 'Erro desconhecido');
-        }
-        
-    } catch (error) {
-        console.error('Erro na inscrição:', error);
-        
-        if (error.message.includes('Email já cadastrado')) {
-            showFieldError(document.getElementById('signup-email'), 'Este email já está registrado em nosso sistema.');
-        } else if (error.message.includes('Idade insuficiente')) {
-            showFieldError(document.getElementById('signup-data-nascimento'), 'É necessário ter pelo menos 18 anos para se inscrever.');
-        } else {
-            showNotification('❌ Erro ao enviar inscrição: ' + error.message, 'error');
-        }
-    } finally {
-        btnText.style.display = 'inline';
-        btnLoader.style.display = 'none';
-        submitBtn.disabled = false;
-    }
-}
-
 
 function handleSubmissionSuccess() {
     showLoading(false);
@@ -1294,7 +1407,10 @@ function showNotification(message, type = 'info') {
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
         <div class="notification-content">
-            <span>${message}</span>
+            <span class="notification-icon">
+                ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+            </span>
+            <span class="notification-message">${message}</span>
             <button class="notification-close" aria-label="Fechar notificação">&times;</button>
         </div>
     `;
