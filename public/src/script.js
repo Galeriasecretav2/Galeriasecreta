@@ -221,7 +221,7 @@ function initializeProfilesData() {
                 { icon: '🏢', name: 'Eventos Corporativos', description: 'Reuniões de negócios e eventos empresariais' }
             ],
             specialties: ['Elegância', 'Discrição', 'Conversação', 'Etiqueta Social', 'Idiomas'],
-            whatsapp: '+258853131185',
+            whatsapp: 'https://wa.me/258865595417?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
             availability: '24/7'
         },
         isabella: {
@@ -450,7 +450,7 @@ function openProfile(profileId) {
     const whatsappBtn = document.getElementById('profile-whatsapp');
     const whatsappMessage = encodeURIComponent(`Olá ${profile.name}! Vi o seu perfil na Galeria Secreta e gostaria de saber mais sobre os seus serviços. Estou interessado em marcar um encontro.`);
     const whatsappNumber = profile.whatsapp.replace(/[^\d]/g, ''); // Remove all non-digits
-    whatsappBtn.href = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+    whatsappBtn.href = `https://wa.me/258865595417?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta}`;
     
     // Add click tracking for WhatsApp button
     whatsappBtn.addEventListener('click', function(e) {
