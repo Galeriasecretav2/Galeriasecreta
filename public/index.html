@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
     <!-- Navigation -->
@@ -37,14 +36,19 @@
                 </button>
                 
 
-                <button id="login-btn" class="nav-action-btn nav-action-primary" aria-label="Fazer login">
+
+
+
+
+<button id="login-btn" class="nav-action-btn nav-action-primary" aria-label="Fazer login">
                     <span class="action-icon">👤</span>
                     <span>Login</span>
                 </button>
 
-                <button id="signup-btn" class="nav-action-btn nav-action-primary" aria-label="Inscrever-se">
-                    <span>Inscrever-se</span>
+                <button id="signup-btn" class="nav-action-btn nav-action-primary" aria-label="Escreva-se">
+                    <span>Escreva-se</span>
                 </button>
+
             </div>
             
             <div id="nav-toggle" class="nav-toggle" aria-label="Menu mobile">
@@ -87,6 +91,9 @@
                     <div class="btn-shine"></div>
                 </button>
             </div>
+        </div>
+        
+        
         </div>
     </section>
 
@@ -559,15 +566,15 @@
     </div>
 
     <!-- Signup Modal -->
-    <div id="signup-modal" class="modal hidden signup-fullscreen" role="dialog" aria-labelledby="signup-title" aria-modal="true">
+    <div id="signup-modal" class="modal hidden" role="dialog" aria-labelledby="signup-title" aria-modal="true">
         <div class="modal-overlay"></div>
-        <div class="modal-content signup-modal-content">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 id="signup-title">Inscrever-se na Galeria Secreta</h3>
                 <button class="modal-close" id="signup-close" aria-label="Fechar modal">&times;</button>
             </div>
             
-            <form class="modal-form signup-form" id="signup-form" novalidate>
+            <form class="modal-form" id="signup-form" novalidate>
                 <div class="form-group">
                     <label for="signup-nome">Nome Completo *</label>
                     <input type="text" id="signup-nome" name="nome" required autocomplete="name" aria-describedby="signup-nome-error">
@@ -852,13 +859,25 @@
     </div>
 
     <link rel="stylesheet" href="src/styles.css">
-    <script src="src/script.js"></script>
-    
-    <script>
-      // Configurar variáveis do Supabase (estas serão definidas pelo servidor)
-      window.SUPABASE_URL = 'YOUR_SUPABASE_URL';
-      window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    </script>
+    <script src="src/script.js">
+document.getElementById('signup-btn')?.addEventListener('click', () => {
+  document.querySelector('#application')?.scrollIntoView({ behavior: 'smooth' });
+});
+
+</script>
+  
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const signupBtn = document.getElementById('signup-btn');
+    const signupModal = document.getElementById('signup-modal');
+    if (signupBtn && signupModal) {
+      signupBtn.addEventListener('click', function () {
+        signupModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+  });
+</script>
 
 </body>
 </html>
