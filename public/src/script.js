@@ -12,6 +12,12 @@ const contactAcompanhantesBtn = document.getElementById('contact-acompanhantes')
 const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
 const supportModal = document.getElementById('support-modal');
+
+// Privacy Policy Modal
+const privacyLink = document.querySelector('.privacy-link');
+const privacyModal = document.getElementById('privacy-modal');
+const privacyClose = document.getElementById('privacy-close');
+
 const successModal = document.getElementById('success-modal');
 const loadingOverlay = document.getElementById('loading-overlay');
 const loginClose = document.getElementById('login-close');
@@ -622,6 +628,20 @@ function setupModalEvents() {
     }
     if (supportClose) {
         supportClose.addEventListener('click', () => closeModal(supportModal));
+    }
+
+    // Privacy Policy Modal Events
+    if (privacyLink && privacyModal) {
+        privacyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal(privacyModal);
+        });
+    }
+
+    if (privacyClose) {
+        privacyClose.addEventListener('click', () => {
+            closeModal(privacyModal);
+        });
     }
 
     // Success modal
