@@ -1015,10 +1015,12 @@ body {
 }
 
 .privacy-text h3 {
-  font-family: var(--font-heading);
+  padding: 1rem 1.25rem;
+  min-height: 3rem;
   font-size: 1.3rem;
   color: var(--accent-color);
   margin: 2rem 0 1rem 0;
+  font-family: inherit;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(212, 175, 55, 0.3);
 }
