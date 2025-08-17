@@ -232,7 +232,7 @@ function initializeProfilesData() {
             category: 'Modelo Experiente',
             age: '28 anos',
             location: 'Nampula',
-            mainImage: '',
+            mainImage: 'https://i.postimg.cc/vm1HVVMZ/123997228-3627243123965219-2863826447702482559-o.jpg',
             gallery: [
                 
             ],
