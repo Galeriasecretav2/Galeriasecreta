@@ -232,7 +232,7 @@ function initializeProfilesData() {
             category: 'Modelo Experiente',
             age: '28 anos',
             location: 'Nampula',
-            mainImage: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
+            mainImage: '',
             gallery: [
                 
             ],
@@ -252,7 +252,7 @@ function initializeProfilesData() {
             category: 'Modelo Premium',
             age: '26 anos',
             location: 'Nampula',
-            mainImage: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400',
+            mainImage: '',
             gallery: [
                 
             ],
@@ -312,7 +312,7 @@ function initializeProfilesData() {
             category: 'Modelo Elite',
             age: '29 anos',
             location: 'Nampula',
-            mainImage: 'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400',
+            mainImage: '',
             gallery: [
                 
             ],
