@@ -252,7 +252,7 @@ function initializeProfilesData() {
             category: 'Modelo Premium',
             age: '26 anos',
             location: 'Nampula',
-            mainImage: '',
+            mainImage: 'https://i.postimg.cc/hGdjzdb1/143127941-421898882477563-1534463607340270020-o.jpg',
             gallery: [
                 
             ],
@@ -292,7 +292,7 @@ function initializeProfilesData() {
             category: 'Modelo VIP',
             age: '27 anos',
             location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
+            mainImage: 'https://i.postimg.cc/QNfkX26k/236757367-4188721321213616-458560518676334121-n.jpg',
             gallery: [
                 
             ],
