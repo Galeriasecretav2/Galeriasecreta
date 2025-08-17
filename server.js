@@ -95,12 +95,12 @@ const logLogin = async (email, usuarioId, sucesso, motivo, req) => {
 app.post('/api/registro', async (req, res) => {
   try {
     console.log('📨 POST /api/registro');
-    const { nome, email, senha, tipo_usuario = 'cliente' } = req.body;
+    const { nome, email, password, tipo_usuario = 'cliente' } = req.body;
 
-    if (!nome || !email || !senha) {
+    if (!nome || !email || !password) {
       return res.status(400).json({ 
         error: 'Campos obrigatórios ausentes',
-        detalhes: 'Nome, email e senha são obrigatórios'
+        detalhes: 'Nome, email e palavra-passe são obrigatórios'
       });
     }
 
@@ -119,7 +119,7 @@ app.post('/api/registro', async (req, res) => {
     }
 
     // Hash da senha
-    const senhaHash = await bcrypt.hash(senha, 12);
+    const senhaHash = await bcrypt.hash(password, 12);
 
     // Inserir usuário
     const { data, error } = await supabase.from('usuarios').insert([{
@@ -164,12 +164,12 @@ app.post('/api/registro', async (req, res) => {
 app.post('/api/login', loginLimiter, async (req, res) => {
   try {
     console.log('📨 POST /api/login');
-    const { email, senha } = req.body;
+    const { email, password } = req.body;
 
-    if (!email || !senha) {
+    if (!email || !password) {
       await logLogin(email || 'N/A', null, false, 'Campos obrigatórios ausentes', req);
       return res.status(400).json({ 
-        error: 'Email e senha são obrigatórios' 
+        error: 'Email e palavra-passe são obrigatórios' 
       });
     }
 
@@ -204,7 +204,7 @@ app.post('/api/login', loginLimiter, async (req, res) => {
     }
 
     // Verificar senha
-    const senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
+    const senhaValida = await bcrypt.compare(password, usuario.senha_hash);
     
     if (!senhaValida) {
       // Incrementar tentativas de login
@@ -226,7 +226,7 @@ app.post('/api/login', loginLimiter, async (req, res) => {
 
       await logLogin(email, usuario.id, false, 'Senha incorreta', req);
       return res.status(401).json({ 
-        error: 'Email ou senha incorretos' 
+        error: 'Email ou palavra-passe incorretos' 
       });
     }
 
