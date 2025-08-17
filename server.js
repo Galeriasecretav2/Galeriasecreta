@@ -444,17 +444,7 @@ app.post('/api/inscricao', async (req, res) => {
     const { 
       nome, 
       email, 
-      telefone, 
-      data_nascimento, 
-      genero, 
-      cidade, 
-      provincia, 
-      profissao, 
-      experiencia_anterior, 
-      motivacao, 
-      disponibilidade, 
-      termos_aceitos, 
-      newsletter 
+      Palavra-passe,
     } = req.body;
 
     console.log('📄 Dados de inscrição recebidos:', req.body);
