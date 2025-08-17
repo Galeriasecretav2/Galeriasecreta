@@ -312,7 +312,7 @@ function initializeProfilesData() {
             category: 'Modelo Elite',
             age: '29 anos',
             location: 'Nampula',
-            mainImage: '',
+            mainImage: 'https://i.postimg.cc/xCWT0TbF/121973195-351310436287938-1918747329702667523-n.jpg',
             gallery: [
                 
             ],
