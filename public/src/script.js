@@ -1,1514 +1,818 @@
-// DOM Elements
-const navbar = document.getElementById('navbar');
-const navToggle = document.getElementById('nav-toggle');
-const navMenu = document.getElementById('nav-menu');
-const applicationForm = document.getElementById('application-form');
-const loginForm = document.getElementById('login-form');
-const loginBtn = document.getElementById('login-btn');
-const supportBtn = document.getElementById('support-btn');
-const joinBtn = document.getElementById('join-btn');
-const signupBtn = document.getElementById('signup-btn');
-const contactAcompanhantesBtn = document.getElementById('contact-acompanhantes');
-const loginModal = document.getElementById('login-modal');
-const signupModal = document.getElementById('signup-modal');
-const supportModal = document.getElementById('support-modal');
+// Configuração global
+const API_BASE_URL = '';
 
-// Privacy Policy Modal
-const privacyLink = document.querySelector('.privacy-link');
-const privacyModal = document.getElementById('privacy-modal');
-const privacyClose = document.getElementById('privacy-close');
+// Utilitários
+const showLoading = (show = true) => {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.classList.toggle('hidden', !show);
+  }
+};
 
-const successModal = document.getElementById('success-modal');
-const loadingOverlay = document.getElementById('loading-overlay');
-const loginClose = document.getElementById('login-close');
-const signupClose = document.getElementById('signup-close');
-const supportClose = document.getElementById('support-close');
-const successClose = document.getElementById('success-close');
-const successOk = document.getElementById('success-ok');
-const switchToLogin = document.getElementById('switch-to-login');
-const photoInput = document.getElementById('foto');
-const photoPreview = document.getElementById('photo-preview');
-const toggleGalleryBtn = document.getElementById('toggle-gallery-btn');
-const acompanhantesSection = document.getElementById('acompanhantes');
-const profileModal = document.getElementById('profile-modal');
-const profileClose = document.getElementById('profile-close');
+const showNotification = (message, type = 'success') => {
+  // Criar notificação toast
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+      <span class="notification-message">${message}</span>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Mostrar notificação
+  setTimeout(() => notification.classList.add('show'), 100);
+  
+  // Remover após 5 segundos
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 5000);
+};
 
-// State Management
-let isSubmitting = false;
-let formData = {};
-let galleryVisible = false;
-let profilesData = {};
-let currentUser = null;
-let authToken = localStorage.getItem('authToken');
+// Dados das acompanhantes
+const acompanhantesData = {
+  sofia: {
+    name: 'Sofia',
+    category: 'Modelo Profissional',
+    age: '25 anos',
+    location: 'Nampula',
+    mainImage: 'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
+    gallery: [
+      'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
+      'https://i.postimg.cc/25N7YD0r/123997228-3627243123965219-2863826447702482559-o.jpg',
+      'https://i.postimg.cc/qRMnBMyV/143127941-421898882477563-1534463607340270020-o.jpg'
+    ],
+    bio: 'Sofia é uma modelo profissional com vasta experiência em campanhas publicitárias e eventos corporativos. Elegante, sofisticada e sempre impecável.',
+    services: ['Acompanhamento em eventos', 'Jantares executivos', 'Viagens de negócios', 'Campanhas fotográficas'],
+    specialties: ['Etiqueta Social', 'Línguas Estrangeiras', 'Protocolo Empresarial', 'Arte & Cultura'],
+    availability: '24/7'
+  },
+  isabella: {
+    name: 'Isabella',
+    category: 'Modelo Experiente',
+    age: '28 anos',
+    location: 'Nampula',
+    mainImage: 'https://i.postimg.cc/25N7YD0r/123997228-3627243123965219-2863826447702482559-o.jpg',
+    gallery: [
+      'https://i.postimg.cc/25N7YD0r/123997228-3627243123965219-2863826447702482559-o.jpg',
+      'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
+      'https://i.postimg.cc/Xv6mztFy/236376192-3857235194382171-763223918932869912-n.jpg'
+    ],
+    bio: 'Isabella combina experiência e charme natural. Especialista em eventos sociais de alto nível e acompanhamento executivo.',
+    services: ['Eventos sociais', 'Acompanhamento executivo', 'Viagens internacionais', 'Consultoria de imagem'],
+    specialties: ['Networking', 'Comunicação', 'Moda & Estilo', 'Gastronomia'],
+    availability: 'Seg-Dom 8h-24h'
+  },
+  valentina: {
+    name: 'Valentina',
+    category: 'Modelo Premium',
+    age: '26 anos',
+    location: 'Nampula',
+    mainImage: 'https://i.postimg.cc/qRMnBMyV/143127941-421898882477563-1534463607340270020-o.jpg',
+    gallery: [
+      'https://i.postimg.cc/qRMnBMyV/143127941-421898882477563-1534463607340270020-o.jpg',
+      'https://i.postimg.cc/66ZR9SGQ/236757367-4188721321213616-458560518676334121-n.jpg',
+      'https://i.postimg.cc/Xv2KCCV7/121973195-351310436287938-1918747329702667523-n.jpg'
+    ],
+    bio: 'Valentina é sinônimo de elegância premium. Especializada em eventos exclusivos e acompanhamento VIP.',
+    services: ['Eventos VIP', 'Acompanhamento premium', 'Consultoria executiva', 'Relações públicas'],
+    specialties: ['Luxo & Sofisticação', 'Diplomacia', 'Arte Contemporânea', 'Vinhos & Gastronomia'],
+    availability: 'Sob consulta'
+  },
+  adriana: {
+    name: 'Adriana',
+    category: 'Modelo Exclusiva',
+    age: '24 anos',
+    location: 'Nampula',
+    mainImage: 'https://i.postimg.cc/Xv6mztFy/236376192-3857235194382171-763223918932869912-n.jpg',
+    gallery: [
+      'https://i.postimg.cc/Xv6mztFy/236376192-3857235194382171-763223918932869912-n.jpg',
+      'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
+      'https://i.postimg.cc/25N7YD0r/123997228-3627243123965219-2863826447702482559-o.jpg'
+    ],
+    bio: 'Adriana representa a nova geração de modelos exclusivas. Jovem, dinâmica e com presença marcante.',
+    services: ['Modelagem exclusiva', 'Eventos fashion', 'Campanhas digitais', 'Acompanhamento jovem'],
+    specialties: ['Moda Jovem', 'Redes Sociais', 'Tendências', 'Lifestyle'],
+    availability: 'Ter-Sáb 10h-22h'
+  },
+  camila: {
+    name: 'Camila',
+    category: 'Modelo VIP',
+    age: '27 anos',
+    location: 'Nampula',
+    mainImage: 'https://i.postimg.cc/66ZR9SGQ/236757367-4188721321213616-458560518676334121-n.jpg',
+    gallery: [
+      'https://i.postimg.cc/66ZR9SGQ/236757367-4188721321213616-458560518676334121-n.jpg',
+      'https://i.postimg.cc/qRMnBMyV/143127941-421898882477563-1534463607340270020-o.jpg',
+      'https://i.postimg.cc/Xv6mztFy/236376192-3857235194382171-763223918932869912-n.jpg'
+    ],
+    bio: 'Camila é uma modelo VIP com experiência internacional. Perfeita para eventos corporativos e sociais de alto padrão.',
+    services: ['Eventos corporativos', 'Acompanhamento VIP', 'Viagens executivas', 'Representação empresarial'],
+    specialties: ['Protocolo Internacional', 'Negócios', 'Idiomas', 'Cultura Empresarial'],
+    availability: '24/7 VIP'
+  },
+  beatriz: {
+    name: 'Beatriz',
+    category: 'Modelo Elite',
+    age: '29 anos',
+    location: 'Nampula',
+    mainImage: 'https://i.postimg.cc/Xv2KCCV7/121973195-351310436287938-1918747329702667523-n.jpg',
+    gallery: [
+      'https://i.postimg.cc/Xv2KCCV7/121973195-351310436287938-1918747329702667523-n.jpg',
+      'https://i.postimg.cc/66ZR9SGQ/236757367-4188721321213616-458560518676334121-n.jpg',
+      'https://i.postimg.cc/25N7YD0r/123997228-3627243123965219-2863826447702482559-o.jpg'
+    ],
+    bio: 'Beatriz representa o mais alto nível de sofisticação. Modelo elite com experiência em eventos internacionais.',
+    services: ['Eventos elite', 'Acompanhamento diplomático', 'Consultoria de alto nível', 'Representação internacional'],
+    specialties: ['Diplomacia', 'Alta Sociedade', 'Protocolo Elite', 'Cultura Internacional'],
+    availability: 'Exclusivo sob consulta'
+  }
+};
 
-// Enhanced Navigation functionality
+// Inicialização quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+  initializeNavigation();
+  initializeModals();
+  initializeForms();
+  initializeButtons();
+  initializeScrollEffects();
 });
 
-function initializeApp() {
-    checkAuthStatus();
-    setupEventListeners();
-    setupFormValidation();
-    setupIntersectionObserver();
-    setupScrollEffects();
-    setupFormAutoSave();
-    preloadCriticalResources();
-    createScrollToTopButton();
-    initializeProfilesData();
-    setupProfileEvents();
-    
-    // Show page after initialization
-    setTimeout(() => {
-        document.body.classList.add('loaded');
-    }, 100);
-}
+// Navegação
+function initializeNavigation() {
+  const navbar = document.getElementById('navbar');
+  const navToggle = document.getElementById('nav-toggle');
+  const navMenu = document.getElementById('nav-menu');
+  const navLinks = document.querySelectorAll('.nav-link');
 
-// Função para verificar status de autenticação
-async function checkAuthStatus() {
-    if (!authToken) {
-        updateAuthUI(false);
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/verify-token', {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            currentUser = data.usuario;
-            updateAuthUI(true);
-        } else {
-            // Token inválido
-            localStorage.removeItem('authToken');
-            authToken = null;
-            updateAuthUI(false);
-        }
-    } catch (error) {
-        console.error('Erro ao verificar token:', error);
-        updateAuthUI(false);
-    }
-}
-
-// Função para atualizar UI baseada no status de auth
-function updateAuthUI(isLoggedIn) {
-    const loginBtn = document.getElementById('login-btn');
-    const signupBtn = document.getElementById('signup-btn');
-    
-    if (isLoggedIn && currentUser) {
-        // Usuário logado
-        if (loginBtn) {
-            loginBtn.innerHTML = `
-                <span class="action-icon">👤</span>
-                <span>${currentUser.nome}</span>
-            `;
-            loginBtn.onclick = showUserMenu;
-        }
-        
-        if (signupBtn) {
-            signupBtn.innerHTML = '<span>Sair</span>';
-            signupBtn.onclick = logout;
-        }
+  // Scroll effect na navbar
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) {
+      navbar.classList.add('scrolled');
     } else {
-        // Usuário não logado
-        if (loginBtn) {
-            loginBtn.innerHTML = `
-                <span class="action-icon">👤</span>
-                <span>Login</span>
-            `;
-            loginBtn.onclick = () => openModal(loginModal);
-        }
-        
-        if (signupBtn) {
-            signupBtn.innerHTML = '<span>Escreva-se</span>';
-            signupBtn.onclick = () => openModal(signupModal);
-        }
+      navbar.classList.remove('scrolled');
     }
+  });
+
+  // Toggle menu mobile
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+      navToggle.classList.toggle('active');
+    });
+  }
+
+  // Smooth scroll para links de navegação
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href');
+      const targetSection = document.querySelector(targetId);
+      
+      if (targetSection) {
+        targetSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+
+      // Fechar menu mobile após clique
+      if (navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('active');
+      }
+    });
+  });
 }
 
-// Função para mostrar menu do usuário (placeholder)
-function showUserMenu() {
-    // Implementar menu dropdown do usuário
-    console.log('Menu do usuário:', currentUser);
+// Modais
+function initializeModals() {
+  // Login Modal
+  const loginBtn = document.getElementById('login-btn');
+  const loginModal = document.getElementById('login-modal');
+  const loginClose = document.getElementById('login-close');
+
+  if (loginBtn && loginModal) {
+    loginBtn.addEventListener('click', () => openModal(loginModal));
+  }
+  if (loginClose) {
+    loginClose.addEventListener('click', () => closeModal(loginModal));
+  }
+
+  // Signup Modal
+  const signupBtn = document.getElementById('signup-btn');
+  const signupModal = document.getElementById('signup-modal');
+  const signupClose = document.getElementById('signup-close');
+
+  if (signupBtn && signupModal) {
+    signupBtn.addEventListener('click', () => openModal(signupModal));
+  }
+  if (signupClose) {
+    signupClose.addEventListener('click', () => closeModal(signupModal));
+  }
+
+  // Support Modal
+  const supportBtn = document.getElementById('support-btn');
+  const supportModal = document.getElementById('support-modal');
+  const supportClose = document.getElementById('support-close');
+
+  if (supportBtn && supportModal) {
+    supportBtn.addEventListener('click', () => openModal(supportModal));
+  }
+  if (supportClose) {
+    supportClose.addEventListener('click', () => closeModal(supportModal));
+  }
+
+  // Profile Modal
+  const profileModal = document.getElementById('profile-modal');
+  const profileClose = document.getElementById('profile-close');
+  
+  if (profileClose) {
+    profileClose.addEventListener('click', () => closeModal(profileModal));
+  }
+
+  // Success Modal
+  const successModal = document.getElementById('success-modal');
+  const successClose = document.getElementById('success-close');
+  const successOk = document.getElementById('success-ok');
+
+  if (successClose) {
+    successClose.addEventListener('click', () => closeModal(successModal));
+  }
+  if (successOk) {
+    successOk.addEventListener('click', () => closeModal(successModal));
+  }
+
+  // Privacy Modal
+  const privacyModal = document.getElementById('privacy-modal');
+  const privacyClose = document.getElementById('privacy-close');
+  const privacyLink = document.querySelector('.privacy-link');
+
+  if (privacyLink && privacyModal) {
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(privacyModal);
+    });
+  }
+  if (privacyClose) {
+    privacyClose.addEventListener('click', () => closeModal(privacyModal));
+  }
+
+  // Switch between login and signup
+  const switchToLogin = document.getElementById('switch-to-login');
+  if (switchToLogin) {
+    switchToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeModal(signupModal);
+      openModal(loginModal);
+    });
+  }
+
+  // Fechar modal clicando no overlay
+  document.querySelectorAll('.modal').forEach(modal => {
+    const overlay = modal.querySelector('.modal-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', () => closeModal(modal));
+    }
+  });
 }
 
-// Função para logout
-async function logout() {
-    try {
-        if (authToken) {
-            await fetch('/api/logout', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                }
-            });
-        }
-    } catch (error) {
-        console.error('Erro no logout:', error);
-    } finally {
-        localStorage.removeItem('authToken');
-        authToken = null;
-        currentUser = null;
-        updateAuthUI(false);
-        showNotification('Logout realizado com sucesso!', 'success');
-    }
-}
-
-function setupEventListeners() {
-    // Join button functionality
-    if (joinBtn) {
-        joinBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            showApplicationForm();
-        });
-    }
-    
-    // Signup button functionality
-    if (signupBtn) {
-        signupBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            openModal(signupModal);
-        });
-    }
-    
-    // Contact acompanhantes button
-    if (contactAcompanhantesBtn) {
-        contactAcompanhantesBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
-    
-    // Toggle gallery button
-    if (toggleGalleryBtn) {
-        toggleGalleryBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            toggleGallery();
-        });
-    }
-
-    // Modal functionality
-    setupModalEvents();
-    
-    // Navigation events
-    setupNavigationEvents();
-    
-    // Form events
-    setupFormEvents();
-    
-    // Keyboard events
-    setupKeyboardEvents();
-}
-
-// Initialize profiles data
-function initializeProfilesData() {
-    profilesData = {
-        sofia: {
-            name: 'Sofia',
-            category: 'Modelo Profissional',
-            age: '25 anos',
-            location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
-            gallery: [
-               
-            ],
-            bio: 'Olá, sou a Sofia! Uma modelo profissional com 5 anos de experiência no ramo. Sou uma pessoa elegante, educada e sempre disposta a proporcionar momentos únicos e inesquecíveis. Valorizo a discrição, o respeito mútuo e a qualidade em todos os encontros. Adoro conversas interessantes, jantares sofisticados e experiências culturais.',
-            services: [
-                { icon: '🍽️', name: 'Jantares Exclusivos', description: 'Acompanhamento em restaurantes e eventos sociais' },
-                { icon: '🎭', name: 'Eventos Culturais', description: 'Teatro, ópera, exposições e eventos artísticos' },
-                { icon: '✈️', name: 'Viagens', description: 'Acompanhamento em viagens nacionais e internacionais' },
-                { icon: '🏢', name: 'Eventos Corporativos', description: 'Reuniões de negócios e eventos empresariais' }
-            ],
-            specialties: ['Elegância', 'Discrição', 'Conversação', 'Etiqueta Social', 'Idiomas'],
-            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
-            availability: '24/7'
-        },
-        isabella: {
-            name: 'Isabella',
-            category: 'Modelo Experiente',
-            age: '28 anos',
-            location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/vm1HVVMZ/123997228-3627243123965219-2863826447702482559-o.jpg',
-            gallery: [
-                
-            ],
-            bio: 'Sou a Isabella, uma acompanhante experiente que valoriza a autenticidade e a conexão genuína. Com formação em psicologia, ofereço não apenas beleza, mas também inteligência emocional e capacidade de adaptação a qualquer ambiente social. Sou apaixonada por arte, literatura e gastronomia.',
-            services: [
-                { icon: '🎨', name: 'Eventos Artísticos', description: 'Vernissages, exposições e eventos culturais' },
-                { icon: '📚', name: 'Encontros Intelectuais', description: 'Conversas profundas e troca de conhecimentos' },
-                { icon: '🍷', name: 'Degustações', description: 'Vinhos, gastronomia e experiências culinárias' },
-                { icon: '🌃', name: 'Vida Noturna', description: 'Bares sofisticados e ambientes exclusivos' }
-            ],
-            specialties: ['Psicologia', 'Arte', 'Gastronomia', 'Literatura', 'Empatia'],
-            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
-            availability: 'Seg-Dom 18h-02h'
-        },
-        valentina: {
-            name: 'Valentina',
-            category: 'Modelo Premium',
-            age: '26 anos',
-            location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/hGdjzdb1/143127941-421898882477563-1534463607340270020-o.jpg',
-            gallery: [
-                
-            ],
-            bio: 'Olá, sou a Valentina! Modelo premium com experiência internacional. Falo fluentemente português, inglês e francês. Sou sofisticada, bem-educada e sempre impecavelmente apresentada. Adoro viajar, conhecer novas culturas e proporcionar experiências memoráveis aos meus clientes mais exigentes.',
-            services: [
-                { icon: '🌍', name: 'Viagens Internacionais', description: 'Acompanhamento em destinos exclusivos' },
-                { icon: '🥂', name: 'Eventos VIP', description: 'Festas exclusivas e eventos de alto nível' },
-                { icon: '🏖️', name: 'Resorts & Spas', description: 'Relaxamento e bem-estar em locais paradisíacos' },
-                { icon: '💎', name: 'Experiências Luxury', description: 'Serviços premium e experiências únicas' }
-            ],
-            specialties: ['Multilíngue', 'Viagens', 'Luxo', 'Protocolo', 'Sofisticação'],
-            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
-            availability: 'Sob consulta'
-        },
-        adriana: {
-            name: 'Adriana',
-            category: 'Modelo Exclusiva',
-            age: '24 anos',
-            location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/N0J5XXxz/236376192-3857235194382171-763223918932869912-n.jpg',
-            gallery: [
-                
-            ],
-            bio: 'Sou a Adriana, jovem, vibrante e cheia de energia! Modelo exclusiva que adora aventuras e experiências novas. Sou espontânea, divertida e sempre trago alegria aos encontros. Adoro música, dança, praia e tudo que envolva diversão e descontração, sempre mantendo a elegância.',
-            services: [
-                { icon: '🎵', name: 'Eventos Musicais', description: 'Concertos, festivais e shows exclusivos' },
-                { icon: '🏖️', name: 'Aventuras na Praia', description: 'Dias relaxantes à beira-mar' },
-                { icon: '🎉', name: 'Festas Privadas', description: 'Celebrações íntimas e divertidas' },
-                { icon: '🌅', name: 'Experiências Naturais', description: 'Passeios e atividades ao ar livre' }
-            ],
-            specialties: ['Juventude', 'Energia', 'Música', 'Dança', 'Aventura'],
-            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
-            availability: 'Ter-Sáb 20h-04h'
-        },
-        camila: {
-            name: 'Camila',
-            category: 'Modelo VIP',
-            age: '27 anos',
-            location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/QNfkX26k/236757367-4188721321213616-458560518676334121-n.jpg',
-            gallery: [
-                
-            ],
-            bio: 'Olá, sou a Camila! Modelo VIP com experiência em moda e publicidade. Sou carismática, inteligente e sempre bem-humorada. Tenho facilidade para me adaptar a qualquer situação social, desde jantares formais até eventos descontraídos. Valorizo a qualidade dos encontros e a satisfação dos meus clientes.',
-            services: [
-                { icon: '📸', name: 'Sessões Fotográficas', description: 'Acompanhamento em ensaios e campanhas' },
-                { icon: '🎪', name: 'Eventos de Moda', description: 'Desfiles, lançamentos e eventos fashion' },
-                { icon: '🍾', name: 'Celebrações Especiais', description: 'Aniversários, comemorações e datas especiais' },
-                { icon: '🎯', name: 'Networking', description: 'Eventos profissionais e conexões de negócios' }
-            ],
-            specialties: ['Moda', 'Fotografia', 'Carisma', 'Networking', 'Versatilidade'],
-            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
-            availability: 'Qua-Dom 19h-03h'
-        },
-        beatriz: {
-            name: 'Beatriz',
-            category: 'Modelo Elite',
-            age: '29 anos',
-            location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/xCWT0TbF/121973195-351310436287938-1918747329702667523-n.jpg',
-            gallery: [
-                
-            ],
-            bio: 'Sou a Beatriz, modelo elite com vasta experiência e maturidade. Ofereço companhia refinada para homens de bom gosto que valorizam a excelência. Sou culta, elegante e possuo uma presença marcante. Especializo-me em encontros de alto nível, sempre priorizando a discrição e a qualidade.',
-            services: [
-                { icon: '👑', name: 'Serviços Elite', description: 'Experiências exclusivas para clientes VIP' },
-                { icon: '🏛️', name: 'Eventos Institucionais', description: 'Cerimônias oficiais e eventos de gala' },
-                { icon: '🎼', name: 'Cultura Clássica', description: 'Ópera, música clássica e arte refinada' },
-                { icon: '💼', name: 'Executivo Premium', description: 'Acompanhamento para executivos e empresários' }
-            ],
-            specialties: ['Elite', 'Maturidade', 'Refinamento', 'Discrição', 'Excelência'],
-            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
-            availability: 'Seg-Sex 18h-24h'
-        }
-    };
-}
-
-function setupProfileEvents() {
-    // Profile modal close events
-    if (profileClose) {
-        profileClose.addEventListener('click', () => closeModal(profileModal));
-    }
-    
-    // Close modal when clicking overlay
-    if (profileModal) {
-        profileModal.addEventListener('click', function(e) {
-            if (e.target === profileModal || e.target.classList.contains('modal-overlay')) {
-                closeModal(profileModal);
-            }
-        });
-    }
-    
-    // Profile buttons
-    document.querySelectorAll('.btn-view-profile').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const profileId = this.getAttribute('data-profile');
-            openProfile(profileId);
-        });
-    });
-    
-    // Make acompanhante cards clickable
-    document.querySelectorAll('.acompanhante-card').forEach(card => {
-        card.addEventListener('click', function(e) {
-            // Don't trigger if clicking the button
-            if (e.target.classList.contains('btn-view-profile')) return;
-            
-            const btn = this.querySelector('.btn-view-profile');
-            if (btn) {
-                const profileId = btn.getAttribute('data-profile');
-                openProfile(profileId);
-            }
-        });
-        
-        // Add cursor pointer to indicate clickability
-        card.style.cursor = 'pointer';
-    });
-}
-
-function openProfile(profileId) {
-    const profile = profilesData[profileId];
-    if (!profile) {
-        showNotification('Perfil não encontrado.', 'error');
-        return;
-    }
-    
-    // Populate profile data
-    document.getElementById('profile-name').textContent = profile.name;
-    document.getElementById('profile-category').textContent = profile.category;
-    document.getElementById('profile-age').textContent = profile.age;
-    document.getElementById('profile-location').textContent = profile.location;
-    document.getElementById('profile-main-img').src = profile.mainImage;
-    document.getElementById('profile-main-img').alt = `Foto de ${profile.name}`;
-    document.getElementById('profile-bio').textContent = profile.bio;
-    document.getElementById('profile-availability').textContent = profile.availability;
-    
-    // Populate gallery
-    const galleryContainer = document.getElementById('profile-gallery');
-    galleryContainer.innerHTML = '';
-    profile.gallery.forEach((imageUrl, index) => {
-        const galleryItem = document.createElement('div');
-        galleryItem.className = 'gallery-item';
-        galleryItem.innerHTML = `
-            <img src="${imageUrl}" alt="Foto ${index + 1} de ${profile.name}" loading="lazy">
-        `;
-        
-        // Add click event to gallery items for full-screen view
-        galleryItem.addEventListener('click', () => {
-            openImageFullscreen(imageUrl, profile.name);
-        });
-        
-        galleryContainer.appendChild(galleryItem);
-    });
-    
-    // Populate services
-    const servicesContainer = document.getElementById('profile-services');
-    servicesContainer.innerHTML = '';
-    profile.services.forEach(service => {
-        const serviceItem = document.createElement('div');
-        serviceItem.className = 'service-item';
-        serviceItem.innerHTML = `
-            <div class="service-icon">${service.icon}</div>
-            <div class="service-details">
-                <h5>${service.name}</h5>
-                <p>${service.description}</p>
-            </div>
-        `;
-        servicesContainer.appendChild(serviceItem);
-    });
-    
-    // Populate specialties
-    const specialtiesContainer = document.getElementById('profile-specialties');
-    specialtiesContainer.innerHTML = '';
-    profile.specialties.forEach(specialty => {
-        const specialtyTag = document.createElement('span');
-        specialtyTag.className = 'specialty-tag';
-        specialtyTag.textContent = specialty;
-        specialtiesContainer.appendChild(specialtyTag);
-    });
-    
-    // Setup WhatsApp link
-    const whatsappBtn = document.getElementById('profile-whatsapp');
-    const whatsappMessage = encodeURIComponent(`Olá ${profile.name}! Vi o seu perfil na Galeria Secreta e gostaria de saber mais sobre os seus serviços. Estou interessado em marcar um encontro.`);
-    const whatsappNumber = profile.whatsapp.replace(/[^\d]/g, ''); // Remove all non-digits
-    whatsappBtn.href = `https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta`;
-    
-    // Add click tracking for WhatsApp button
-    whatsappBtn.addEventListener('click', function(e) {
-        // Track the click (you can add analytics here)
-        console.log(`WhatsApp contact initiated for ${profile.name}`);
-        
-        // Show feedback to user
-        showNotification(`Redirecionando para WhatsApp de ${profile.name}...`, 'info');
-    });
-    
-    // Setup call button
-    const callBtn = document.getElementById('profile-call');
-    // Remove any existing event listeners
-    const newCallBtn = callBtn.cloneNode(true);
-    callBtn.parentNode.replaceChild(newCallBtn, callBtn);
-    
-    newCallBtn.addEventListener('click', function() {
-        showNotification(`Iniciando chamada para ${profile.name}...`, 'info');
-        setTimeout(() => {
-            window.location.href = `tel:${profile.whatsapp}`;
-        }, 1000);
-    });
-    
-    // Open modal
-    openModal(profileModal);
-    
-    // Scroll to top of modal content
-    const profileContent = document.querySelector('.profile-content');
-    if (profileContent) {
-        profileContent.scrollTop = 0;
-    }
-    
-    // Add escape key listener for this specific modal
-    const handleProfileEscape = (e) => {
-        if (e.key === 'Escape') {
-            closeModal(profileModal);
-            document.removeEventListener('keydown', handleProfileEscape);
-        }
-    };
-    document.addEventListener('keydown', handleProfileEscape);
-}
-
-function openImageFullscreen(imageUrl, modelName) {
-    // Create fullscreen image overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'image-fullscreen-overlay';
-    overlay.innerHTML = `
-        <div class="fullscreen-content">
-            <img src="${imageUrl}" alt="Foto de ${modelName}">
-            <button class="fullscreen-close" aria-label="Fechar">&times;</button>
-        </div>
-    `;
-    
-    // Add styles
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        z-index: 20000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(10px);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    `;
-    
-    const content = overlay.querySelector('.fullscreen-content');
-    content.style.cssText = `
-        position: relative;
-        max-width: 90%;
-        max-height: 90%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    `;
-    
-    const img = overlay.querySelector('img');
-    img.style.cssText = `
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        border-radius: 10px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    `;
-    
-    const closeBtn = overlay.querySelector('.fullscreen-close');
-    closeBtn.style.cssText = `
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        font-size: 2rem;
-        cursor: pointer;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.3s ease;
-    `;
-    
-    // Add to DOM
-    document.body.appendChild(overlay);
+function openModal(modal) {
+  if (modal) {
+    modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
     
-    // Show with animation
-    setTimeout(() => {
-        overlay.style.opacity = '1';
-    }, 10);
-    
-    // Close events
-    const closeFullscreen = () => {
-        overlay.style.opacity = '0';
-        setTimeout(() => {
-            if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
-            }
-            document.body.style.overflow = 'auto';
-        }, 300);
-    };
-    
-    closeBtn.addEventListener('click', closeFullscreen);
-    overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) {
-            closeFullscreen();
-        }
-    });
-    
-    // Close with Escape key
-    const handleEscape = (e) => {
-        if (e.key === 'Escape') {
-            closeFullscreen();
-            document.removeEventListener('keydown', handleEscape);
-        }
-    };
-    document.addEventListener('keydown', handleEscape);
-}
-
-function setupModalEvents() {
-    // Login modal
-    if (loginModal && loginClose) {
-        loginClose.addEventListener('click', () => closeModal(loginModal));
-        
-        if (loginForm) {
-            loginForm.addEventListener('submit', handleLogin);
-        }
+    // Focus no primeiro input se existir
+    const firstInput = modal.querySelector('input');
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 100);
     }
-    
-    // Signup modal
-    if (signupModal && signupClose) {
-        signupClose.addEventListener('click', () => closeModal(signupModal));
-        
-        const signupForm = document.getElementById('signup-form');
-        if (signupForm) {
-            signupForm.addEventListener('submit', handleSignup);
-        }
-    }
-
-    // Support modal
-    if (supportBtn) {
-        supportBtn.addEventListener('click', () => openModal(supportModal));
-    }
-    if (supportClose) {
-        supportClose.addEventListener('click', () => closeModal(supportModal));
-    }
-
-    // Privacy Policy Modal Events
-    if (privacyLink && privacyModal) {
-        privacyLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal(privacyModal);
-        });
-    }
-
-    if (privacyClose) {
-        privacyClose.addEventListener('click', () => {
-            closeModal(privacyModal);
-        });
-    }
-
-    // Success modal
-    if (successClose) {
-        successClose.addEventListener('click', () => closeModal(successModal));
-    }
-    if (successOk) {
-        successOk.addEventListener('click', () => closeModal(successModal));
-    }
-    
-    // Switch between login and signup
-    if (switchToLogin) {
-        switchToLogin.addEventListener('click', function(e) {
-            e.preventDefault();
-            closeModal(signupModal);
-            openModal(loginModal);
-        });
-    }
-    
-
-    // Close modals when clicking overlay
-    [loginModal, signupModal, supportModal, successModal].forEach(modal => {
-        if (modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal || e.target.classList.contains('modal-overlay')) {
-                    closeModal(modal);
-                }
-            });
-        }
-    });
-}
-
-// Handler para login
-async function handleLogin(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const formData = new FormData(form);
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoader = submitBtn.querySelector('.btn-loader');
-    
-    // Mostrar loading
-    btnText.style.display = 'none';
-    btnLoader.style.display = 'block';
-    submitBtn.disabled = true;
-    
-    try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: formData.get('email'),
-                senha: formData.get('password')
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Login bem-sucedido
-            authToken = data.token;
-            currentUser = data.usuario;
-            localStorage.setItem('authToken', authToken);
-            
-            closeModal(loginModal);
-            updateAuthUI(true);
-            showNotification('Login realizado com sucesso!', 'success');
-            form.reset();
-        } else {
-            // Erro no login
-            showNotification(data.error || 'Erro no login', 'error');
-        }
-    } catch (error) {
-        console.error('Erro no login:', error);
-        showNotification('Erro de conexão. Tente novamente.', 'error');
-    } finally {
-        // Esconder loading
-        btnText.style.display = 'block';
-        btnLoader.style.display = 'none';
-        submitBtn.disabled = false;
-    }
-}
-
-// Handler para signup (registro)
-async function handleSignup(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const formData = new FormData(form);
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoader = submitBtn.querySelector('.btn-loader');
-    
-    // Validar campos obrigatórios
-    const requiredFields = ['nome', 'email', 'telefone', 'data_nascimento', 'genero', 'cidade', 'provincia', 'disponibilidade'];
-    for (const field of requiredFields) {
-        if (!formData.get(field)) {
-            showNotification(`Campo ${field} é obrigatório`, 'error');
-            return;
-        }
-    }
-    
-    // Validar termos
-    if (!formData.get('termos_aceitos')) {
-        showNotification('Você deve aceitar os termos e condições', 'error');
-        return;
-    }
-    
-    // Mostrar loading
-    btnText.style.display = 'none';
-    btnLoader.style.display = 'block';
-    submitBtn.disabled = true;
-    
-    try {
-        const response = await fetch('/api/inscricao', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                nome: formData.get('nome'),
-                email: formData.get('email'),
-                telefone: formData.get('telefone'),
-                data_nascimento: formData.get('data_nascimento'),
-                genero: formData.get('genero'),
-                cidade: formData.get('cidade'),
-                provincia: formData.get('provincia'),
-                profissao: formData.get('profissao') || '',
-                experiencia_anterior: formData.get('experiencia_anterior') === 'on',
-                motivacao: formData.get('motivacao') || '',
-                disponibilidade: formData.get('disponibilidade'),
-                termos_aceitos: formData.get('termos_aceitos') === 'on',
-                newsletter: formData.get('newsletter') === 'on'
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Inscrição bem-sucedida
-            closeModal(signupModal);
-            showNotification('Inscrição realizada com sucesso!', 'success');
-            form.reset();
-        } else {
-            // Erro na inscrição
-            showNotification(data.error || 'Erro na inscrição', 'error');
-        }
-    } catch (error) {
-        console.error('Erro na inscrição:', error);
-        showNotification('Erro de conexão. Tente novamente.', 'error');
-    } finally {
-        // Esconder loading
-        btnText.style.display = 'block';
-        btnLoader.style.display = 'none';
-        submitBtn.disabled = false;
-    }
-}
-
-function setupNavigationEvents() {
-    // Mobile menu toggle
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-            navToggle.classList.toggle('active');
-            
-            // Prevent body scroll when menu is open
-            if (navMenu.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
-            }
-        });
-    }
-
-    // Close mobile menu when clicking on a link
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function() {
-            if (navMenu) navMenu.classList.remove('active');
-            if (navToggle) navToggle.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        });
-    });
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                const offsetTop = target.offsetTop - 100;
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-}
-
-function setupFormEvents() {
-    // Application form submission
-    if (applicationForm) {
-        applicationForm.addEventListener('submit', handleApplicationSubmit);
-    }
-
-    // Photo upload functionality
-    if (photoInput) {
-        photoInput.addEventListener('change', handlePhotoUpload);
-        setupDragAndDrop();
-    }
-}
-
-function setupKeyboardEvents() {
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeAllModals();
-            closeMobileMenu();
-            hideAllNotifications();
-        }
-    });
-}
-
-// Gallery Toggle Functionality
-function toggleGallery() {
-    if (!acompanhantesSection) return;
-    
-    galleryVisible = !galleryVisible;
-    
-    if (galleryVisible) {
-        // Show gallery
-        acompanhantesSection.classList.remove('hidden');
-        toggleGalleryBtn.innerHTML = `
-            Ocultar Galeria
-            <div class="btn-shine"></div>
-        `;
-        
-        // Smooth scroll to gallery after a short delay
-        setTimeout(() => {
-            acompanhantesSection.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }, 300);
-        
-    } else {
-        // Hide gallery
-        acompanhantesSection.classList.add('hidden');
-        toggleGalleryBtn.innerHTML = `
-            Ver Nossas Acompanhantes
-            <div class="btn-shine"></div>
-        `;
-        
-        // Scroll back to the button
-        toggleGalleryBtn.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'center'
-        });
-    }
-}
-
-// Modal Management
-function openModal(modal) {
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        
-        // Focus management for accessibility
-        const firstInput = modal.querySelector('input, button');
-        if (firstInput) {
-            setTimeout(() => firstInput.focus(), 100);
-        }
-    }
+  }
 }
 
 function closeModal(modal) {
-    if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-}
-
-function closeAllModals() {
-    [loginModal, signupModal, supportModal, successModal, profileModal].forEach(modal => {
-        if (modal) closeModal(modal);
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+    
+    // Limpar formulários
+    const forms = modal.querySelectorAll('form');
+    forms.forEach(form => {
+      form.reset();
+      clearFormErrors(form);
     });
+  }
 }
 
-function closeMobileMenu() {
-    if (navMenu) navMenu.classList.remove('active');
-    if (navToggle) navToggle.classList.remove('active');
-    document.body.style.overflow = 'auto';
+// Formulários
+function initializeForms() {
+  // Login Form
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', handleLogin);
+  }
+
+  // Signup Form
+  const signupForm = document.getElementById('signup-form');
+  if (signupForm) {
+    signupForm.addEventListener('submit', handleSignup);
+  }
+
+  // Application Form
+  const applicationForm = document.getElementById('application-form');
+  if (applicationForm) {
+    applicationForm.addEventListener('submit', handleApplication);
+    
+    // Preview da foto
+    const fotoInput = document.getElementById('foto');
+    const photoPreview = document.getElementById('photo-preview');
+    const fileUploadText = fotoInput?.parentElement.querySelector('.file-upload-text');
+    
+    if (fotoInput && photoPreview) {
+      fotoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            photoPreview.src = e.target.result;
+            photoPreview.style.display = 'block';
+            if (fileUploadText) {
+              fileUploadText.style.display = 'none';
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  }
 }
 
-// Application Form Management
-function showApplicationForm() {
-    const applicationSection = document.getElementById('application');
-    if (applicationSection) {
+// Handlers dos formulários
+async function handleLogin(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Limpar erros anteriores
+  clearFormErrors(form);
+  
+  // Validação
+  const email = formData.get('email');
+  const password = formData.get('password');
+  
+  if (!email || !password) {
+    showFormError(form, 'email', 'Email é obrigatório');
+    showFormError(form, 'password', 'Palavra-passe é obrigatória');
+    return;
+  }
+  
+  // Loading state
+  setButtonLoading(submitBtn, true);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        senha: password
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showNotification('Login realizado com sucesso!', 'success');
+      
+      // Salvar token se fornecido
+      if (data.token) {
+        localStorage.setItem('authToken', data.token);
+      }
+      
+      // Fechar modal
+      const modal = document.getElementById('login-modal');
+      closeModal(modal);
+      
+      // Atualizar interface se necessário
+      updateUserInterface(data.usuario);
+      
+    } else {
+      showNotification(data.error || 'Erro no login', 'error');
+    }
+    
+  } catch (error) {
+    console.error('Erro no login:', error);
+    showNotification('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+}
+
+async function handleSignup(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Limpar erros anteriores
+  clearFormErrors(form);
+  
+  // Validação
+  const nome = formData.get('nome')?.trim();
+  const email = formData.get('email')?.trim();
+  const password = formData.get('password');
+  const confirmPassword = formData.get('confirmPassword');
+  
+  let hasErrors = false;
+  
+  if (!nome || nome.length < 2) {
+    showFormError(form, 'nome', 'Nome deve ter pelo menos 2 caracteres');
+    hasErrors = true;
+  }
+  
+  if (!email || !isValidEmail(email)) {
+    showFormError(form, 'email', 'Email inválido');
+    hasErrors = true;
+  }
+  
+  if (!password || password.length < 6) {
+    showFormError(form, 'password', 'Palavra-passe deve ter pelo menos 6 caracteres');
+    hasErrors = true;
+  }
+  
+  if (password !== confirmPassword) {
+    showFormError(form, 'confirmPassword', 'Palavras-passe não coincidem');
+    hasErrors = true;
+  }
+  
+  if (hasErrors) return;
+  
+  // Loading state
+  setButtonLoading(submitBtn, true);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/inscricao`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nome,
+        email,
+        password
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showNotification('Inscrição realizada com sucesso!', 'success');
+      
+      // Fechar modal
+      const modal = document.getElementById('signup-modal');
+      closeModal(modal);
+      
+    } else {
+      if (response.status === 409) {
+        showFormError(form, 'email', 'Este email já está registrado');
+      } else {
+        showNotification(data.error || 'Erro na inscrição', 'error');
+      }
+    }
+    
+  } catch (error) {
+    console.error('Erro na inscrição:', error);
+    showNotification('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+}
+
+async function handleApplication(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Limpar erros anteriores
+  clearFormErrors(form);
+  
+  // Validação
+  const nome = formData.get('nome')?.trim();
+  const idade = formData.get('idade');
+  const provincia = formData.get('provincia');
+  const email = formData.get('email')?.trim();
+  const whatsapp = formData.get('whatsapp')?.trim();
+  const foto = formData.get('foto');
+  const termos = formData.get('termos');
+  
+  let hasErrors = false;
+  
+  if (!nome || nome.length < 2) {
+    showFormError(form, 'nome', 'Nome é obrigatório');
+    hasErrors = true;
+  }
+  
+  if (!idade || idade < 18 || idade > 65) {
+    showFormError(form, 'idade', 'Idade deve estar entre 18 e 65 anos');
+    hasErrors = true;
+  }
+  
+  if (!provincia) {
+    showFormError(form, 'provincia', 'Selecione uma província');
+    hasErrors = true;
+  }
+  
+  if (!email || !isValidEmail(email)) {
+    showFormError(form, 'email', 'Email inválido');
+    hasErrors = true;
+  }
+  
+  if (!whatsapp) {
+    showFormError(form, 'whatsapp', 'WhatsApp é obrigatório');
+    hasErrors = true;
+  }
+  
+  if (!foto || foto.size === 0) {
+    showFormError(form, 'foto', 'Foto é obrigatória');
+    hasErrors = true;
+  }
+  
+  if (!termos) {
+    showFormError(form, 'termos', 'Deve aceitar os termos e condições');
+    hasErrors = true;
+  }
+  
+  if (hasErrors) return;
+  
+  // Loading state
+  setButtonLoading(submitBtn, true);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/candidatura`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      // Mostrar modal de sucesso
+      const successModal = document.getElementById('success-modal');
+      openModal(successModal);
+      
+      // Esconder seção de candidatura
+      const applicationSection = document.getElementById('application');
+      if (applicationSection) {
+        applicationSection.classList.add('hidden');
+      }
+      
+    } else {
+      showNotification(data.error || 'Erro ao enviar candidatura', 'error');
+    }
+    
+  } catch (error) {
+    console.error('Erro na candidatura:', error);
+    showNotification('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+}
+
+// Botões principais
+function initializeButtons() {
+  // Botão "Quero Fazer Parte"
+  const joinBtn = document.getElementById('join-btn');
+  if (joinBtn) {
+    joinBtn.addEventListener('click', () => {
+      const applicationSection = document.getElementById('application');
+      if (applicationSection) {
         applicationSection.classList.remove('hidden');
         applicationSection.scrollIntoView({ behavior: 'smooth' });
-    }
-}
+      }
+    });
+  }
 
-async function handleApplicationSubmit(e) {
-    e.preventDefault();
-    
-    if (isSubmitting) return;
-    
-    // Validate form
-    if (!validateForm(applicationForm)) {
-        showNotification('Por favor, corrija os erros no formulário.', 'error');
-        return;
-    }
-
-    // Age validation
-    const idade = parseInt(document.getElementById('idade').value);
-    if (idade < 18 || idade > 65) {
-        showNotification('A idade deve estar entre 18 e 65 anos.', 'error');
-        return;
-    }
-
-    isSubmitting = true;
-    showLoading(true);
-    setSubmitButtonState(true);
-
-    try {
-        const formData = new FormData(applicationForm);
-        formData.append('timestamp', new Date().toISOString());
-
-        const response = await fetchWithRetry('/api/candidatura', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            handleSubmissionSuccess();
+  // Botão "Ver Nossas Acompanhantes"
+  const toggleGalleryBtn = document.getElementById('toggle-gallery-btn');
+  if (toggleGalleryBtn) {
+    toggleGalleryBtn.addEventListener('click', () => {
+      const acompanhantesSection = document.getElementById('acompanhantes');
+      if (acompanhantesSection) {
+        const isHidden = acompanhantesSection.classList.contains('hidden');
+        
+        if (isHidden) {
+          acompanhantesSection.classList.remove('hidden');
+          toggleGalleryBtn.innerHTML = `
+            Ocultar Acompanhantes
+            <div class="btn-shine"></div>
+          `;
+          acompanhantesSection.scrollIntoView({ behavior: 'smooth' });
         } else {
-            const result = await response.json();
-            throw new Error(result.detalhe || result.error || 'Erro desconhecido');
+          acompanhantesSection.classList.add('hidden');
+          toggleGalleryBtn.innerHTML = `
+            Ver Nossas Acompanhantes
+            <div class="btn-shine"></div>
+          `;
         }
-    } catch (error) {
-        handleSubmissionError(error);
-    } finally {
-        isSubmitting = false;
-        showLoading(false);
-        setSubmitButtonState(false);
-    }
-}
-
-function handleSubmissionSuccess() {
-    showLoading(false);
-    openModal(successModal);
-    applicationForm.reset();
-    resetPhotoPreview();
-    clearFormAutoSave();
-    clearFormErrors(applicationForm);
-}
-
-function handleSubmissionError(error) {
-    showNotification('❌ Erro ao enviar: ' + error.message, 'error');
-}
-
-function setSubmitButtonState(loading) {
-    const submitBtn = document.querySelector('.btn-submit');
-    if (!submitBtn) return;
-    
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoader = submitBtn.querySelector('.btn-loader');
-    
-    if (loading) {
-        btnText.style.display = 'none';
-        btnLoader.style.display = 'inline-block';
-        submitBtn.disabled = true;
-        submitBtn.style.opacity = '0.7';
-    } else {
-        btnText.style.display = 'inline';
-        btnLoader.style.display = 'none';
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = '1';
-    }
-}
-
-// Photo Upload Management
-function handlePhotoUpload(event) {
-    const file = event.target.files[0];
-    const fileUploadText = document.querySelector('.file-upload-text');
-    
-    if (file) {
-        if (!validateFile(file)) {
-            event.target.value = '';
-            resetPhotoPreview();
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            showPhotoPreview(e.target.result);
-        };
-        reader.readAsDataURL(file);
-    } else {
-        resetPhotoPreview();
-    }
-}
-
-function validateFile(file) {
-    if (!file.type.startsWith('image/')) {
-        showNotification('Por favor, selecione apenas arquivos de imagem.', 'error');
-        return false;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-        showNotification('O arquivo deve ter no máximo 10MB.', 'error');
-        return false;
-    }
-
-    return true;
-}
-
-function showPhotoPreview(src) {
-    const fileUploadText = document.querySelector('.file-upload-text');
-    
-    if (fileUploadText) fileUploadText.style.display = 'none';
-    if (photoPreview) {
-        photoPreview.src = src;
-        photoPreview.style.display = 'block';
-        photoPreview.style.opacity = '0';
-        photoPreview.style.transform = 'scale(0.8)';
-        
-        setTimeout(() => {
-            photoPreview.style.transition = 'all 0.3s ease';
-            photoPreview.style.opacity = '1';
-            photoPreview.style.transform = 'scale(1)';
-        }, 100);
-    }
-}
-
-function resetPhotoPreview() {
-    const fileUploadText = document.querySelector('.file-upload-text');
-    
-    if (fileUploadText) fileUploadText.style.display = 'flex';
-    if (photoPreview) {
-        photoPreview.style.display = 'none';
-        photoPreview.src = '#';
-    }
-}
-
-function setupDragAndDrop() {
-    const fileUpload = document.querySelector('.file-upload');
-    
-    if (!fileUpload) return;
-
-    ['dragover', 'dragenter'].forEach(eventName => {
-        fileUpload.addEventListener(eventName, function(e) {
-            e.preventDefault();
-            this.style.borderColor = 'var(--primary-color)';
-            this.style.background = 'rgba(201, 168, 118, 0.1)';
-            this.style.transform = 'scale(1.02)';
-        });
+      }
     });
+  }
 
-    ['dragleave', 'dragend'].forEach(eventName => {
-        fileUpload.addEventListener(eventName, function(e) {
-            e.preventDefault();
-            this.style.borderColor = 'var(--border-color)';
-            this.style.background = 'rgba(255, 255, 255, 0.02)';
-            this.style.transform = 'scale(1)';
-        });
+  // Botões "Ver Perfil" das acompanhantes
+  const viewProfileBtns = document.querySelectorAll('.btn-view-profile');
+  viewProfileBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const profileName = btn.getAttribute('data-profile');
+      if (profileName && acompanhantesData[profileName]) {
+        showProfile(acompanhantesData[profileName]);
+      }
     });
+  });
 
-    fileUpload.addEventListener('drop', function(e) {
-        e.preventDefault();
-        this.style.borderColor = 'var(--border-color)';
-        this.style.background = 'rgba(255, 255, 255, 0.02)';
-        this.style.transform = 'scale(1)';
-        
-        const files = e.dataTransfer.files;
-        if (files.length > 0 && photoInput) {
-            photoInput.files = files;
-            photoInput.dispatchEvent(new Event('change'));
-        }
+  // Botão "Entre em Contacto" na seção de acompanhantes
+  const contactAcompanhantesBtn = document.getElementById('contact-acompanhantes');
+  if (contactAcompanhantesBtn) {
+    contactAcompanhantesBtn.addEventListener('click', () => {
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
     });
+  }
+
+  // Botões de contacto no perfil
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'profile-call') {
+      window.open('tel:+258851551556', '_self');
+    }
+  });
 }
 
-// Form Validation
-function setupFormValidation() {
-    const inputs = document.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('blur', validateField);
-        input.addEventListener('input', clearFieldError);
+// Mostrar perfil da acompanhante
+function showProfile(profileData) {
+  const modal = document.getElementById('profile-modal');
+  if (!modal) return;
+
+  // Preencher dados básicos
+  document.getElementById('profile-name').textContent = profileData.name;
+  document.getElementById('profile-category').textContent = profileData.category;
+  document.getElementById('profile-age').textContent = profileData.age;
+  document.getElementById('profile-location').textContent = profileData.location;
+  document.getElementById('profile-main-img').src = profileData.mainImage;
+  document.getElementById('profile-bio').textContent = profileData.bio;
+  document.getElementById('profile-availability').textContent = profileData.availability;
+
+  // Preencher galeria
+  const gallery = document.getElementById('profile-gallery');
+  gallery.innerHTML = '';
+  profileData.gallery.forEach(imageUrl => {
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.alt = 'Foto da galeria';
+    img.className = 'gallery-image';
+    gallery.appendChild(img);
+  });
+
+  // Preencher serviços
+  const services = document.getElementById('profile-services');
+  services.innerHTML = '';
+  profileData.services.forEach(service => {
+    const serviceItem = document.createElement('div');
+    serviceItem.className = 'service-item';
+    serviceItem.innerHTML = `<span class="service-icon">✨</span> ${service}`;
+    services.appendChild(serviceItem);
+  });
+
+  // Preencher especialidades
+  const specialties = document.getElementById('profile-specialties');
+  specialties.innerHTML = '';
+  profileData.specialties.forEach(specialty => {
+    const tag = document.createElement('span');
+    tag.className = 'specialty-tag';
+    tag.textContent = specialty;
+    specialties.appendChild(tag);
+  });
+
+  // Atualizar link do WhatsApp
+  const whatsappBtn = document.getElementById('profile-whatsapp');
+  if (whatsappBtn) {
+    whatsappBtn.href = `https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20em%20conhecer%20${profileData.name}%20da%20Galeria%20Secreta`;
+  }
+
+  // Mostrar modal
+  openModal(modal);
+}
+
+// Efeitos de scroll
+function initializeScrollEffects() {
+  // Animação de elementos ao entrar na viewport
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-in');
+      }
     });
+  }, observerOptions);
+
+  // Observar elementos animáveis
+  const animatableElements = document.querySelectorAll(
+    '.service-card, .benefit-card, .acompanhante-card, .value-item, .contact-item'
+  );
+  
+  animatableElements.forEach(el => {
+    observer.observe(el);
+  });
+
+  // Parallax suave no hero
+  window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const heroBackground = document.querySelector('.hero-background');
+    
+    if (heroBackground) {
+      heroBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
+    }
+  });
 }
 
-function validateForm(form) {
-    const inputs = form.querySelectorAll('input, select, textarea');
-    let isValid = true;
-    
-    inputs.forEach(input => {
-        if (!validateField({ target: input })) {
-            isValid = false;
-        }
-    });
-    
-    return isValid;
-}
-
-function validateField(event) {
-    const field = event.target;
-    const value = field.value.trim();
-    let isValid = true;
-    let errorMessage = '';
-
-    clearFieldError(event);
-
-    // Required field validation
-    if (field.hasAttribute('required') && !value) {
-        isValid = false;
-        errorMessage = 'Este campo é obrigatório.';
-    } else if (value) {
-        // Type-specific validation
-        switch (field.type) {
-            case 'email':
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) {
-                    isValid = false;
-                    errorMessage = 'Por favor, insira um email válido.';
-                }
-                break;
-            
-            case 'tel':
-                const phoneRegex = /^[+]?[\d\s\-\(\)]{9,}$/;
-                if (!phoneRegex.test(value)) {
-                    isValid = false;
-                    errorMessage = 'Por favor, insira um número de telefone válido.';
-                }
-                break;
-            
-            case 'number':
-                if (field.name === 'idade') {
-                    const age = parseInt(value);
-                    if (age < 18) {
-                        isValid = false;
-                        errorMessage = 'A idade mínima é 18 anos.';
-                    } else if (age > 65) {
-                        isValid = false;
-                        errorMessage = 'A idade máxima é 65 anos.';
-                    }
-                }
-                break;
-            
-            case 'text':
-                if (field.name === 'nome' && value.length < 2) {
-                    isValid = false;
-                    errorMessage = 'O nome deve ter pelo menos 2 caracteres.';
-                }
-                if (field.name === 'cidade' && value.length < 2) {
-                    isValid = false;
-                    errorMessage = 'A cidade deve ter pelo menos 2 caracteres.';
-                }
-                break;
-            
-            case 'date':
-                if (field.name === 'data_nascimento') {
-                    const birthDate = new Date(value);
-                    const today = new Date();
-                    let age = today.getFullYear() - birthDate.getFullYear();
-                    const monthDiff = today.getMonth() - birthDate.getMonth();
-                    
-                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                        age--;
-                    }
-                    
-                    if (age < 18) {
-                        isValid = false;
-                        errorMessage = 'É necessário ter pelo menos 18 anos.';
-                    } else if (age > 80) {
-                        isValid = false;
-                        errorMessage = 'Idade máxima permitida é 80 anos.';
-                    }
-                }
-                break;
-        }
-
-        // Textarea validation
-        if (field.tagName === 'TEXTAREA' && field.hasAttribute('required')) {
-            if (value.length < 10) {
-                isValid = false;
-                errorMessage = 'Por favor, forneça uma descrição mais detalhada (mínimo 10 caracteres).';
-            }
-        }
-        
-        // Select validation
-        if (field.tagName === 'SELECT' && field.hasAttribute('required') && !value) {
-            isValid = false;
-            errorMessage = 'Por favor, selecione uma opção.';
-        }
-    }
-
-    // File validation
-    if (field.type === 'file' && field.hasAttribute('required') && field.files.length === 0) {
-        isValid = false;
-        errorMessage = 'Por favor, selecione uma foto.';
-    }
-
-    // Checkbox validation
-    if (field.type === 'checkbox' && field.hasAttribute('required') && !field.checked) {
-        if (field.name === 'termos_aceitos') {
-            isValid = false;
-            errorMessage = 'Deve concordar com os termos e condições.';
-        }
-    }
-    
-
-    if (!isValid) {
-        showFieldError(field, errorMessage);
-    }
-
-    return isValid;
-}
-
-function showFieldError(field, message) {
-    field.classList.add('error');
-    
-    const errorElement = document.getElementById(field.name + '-error') || 
-                        field.parentNode.querySelector('.error-message');
-    
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.classList.add('show');
-    }
-}
-
-function clearFieldError(event) {
-    const field = event.target;
-    field.classList.remove('error');
-    
-    const errorElement = document.getElementById(field.name + '-error') || 
-                        field.parentNode.querySelector('.error-message');
-    
-    if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.classList.remove('show');
-    }
-}
-
+// Utilitários para formulários
 function clearFormErrors(form) {
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        input.classList.remove('error');
-        const errorElement = document.getElementById(input.name + '-error') || 
-                            input.parentNode.querySelector('.error-message');
-        if (errorElement) {
-            errorElement.textContent = '';
-            errorElement.classList.remove('show');
-        }
-    });
+  const errorMessages = form.querySelectorAll('.error-message');
+  errorMessages.forEach(error => {
+    error.textContent = '';
+    error.style.display = 'none';
+  });
+  
+  const errorInputs = form.querySelectorAll('.error');
+  errorInputs.forEach(input => {
+    input.classList.remove('error');
+  });
 }
 
-// Scroll Effects
-function setupScrollEffects() {
-    let lastScrollTop = 0;
-    
-    window.addEventListener('scroll', debounce(() => {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Navbar scroll effect
-        if (navbar) {
-            if (scrollTop > 100) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-            
-            // Hide/show navbar on scroll
-            if (scrollTop > lastScrollTop && scrollTop > 200) {
-                navbar.style.transform = 'translateY(-100%)';
-            } else {
-                navbar.style.transform = 'translateY(0)';
-            }
-        }
-        
-        // Scroll to top button
-        const scrollTopBtn = document.querySelector('.scroll-top-btn');
-        if (scrollTopBtn) {
-            if (scrollTop > 500) {
-                scrollTopBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-            }
-        }
-        
-        lastScrollTop = scrollTop;
-    }, 10));
+function showFormError(form, fieldName, message) {
+  const field = form.querySelector(`[name="${fieldName}"]`);
+  const errorElement = form.querySelector(`#${fieldName.replace(/([A-Z])/g, '-$1').toLowerCase()}-error`) || 
+                      form.querySelector(`#${fieldName}-error`);
+  
+  if (field) {
+    field.classList.add('error');
+  }
+  
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+  }
 }
 
-// Intersection Observer for animations
-function setupIntersectionObserver() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                entry.target.classList.add('loaded');
-            }
-        });
-    }, observerOptions);
-
-    // Observe elements for animation
-    document.querySelectorAll('.value-item, .service-card, .benefit-card, .contact-item').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(50px)';
-        el.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-        observer.observe(el);
-    });
+function setButtonLoading(button, loading) {
+  if (!button) return;
+  
+  const btnText = button.querySelector('.btn-text');
+  const btnLoader = button.querySelector('.btn-loader');
+  
+  if (loading) {
+    button.disabled = true;
+    if (btnText) btnText.style.opacity = '0';
+    if (btnLoader) btnLoader.style.display = 'block';
+  } else {
+    button.disabled = false;
+    if (btnText) btnText.style.opacity = '1';
+    if (btnLoader) btnLoader.style.display = 'none';
+  }
 }
 
-// Form Auto-save
-function setupFormAutoSave() {
-    const formFields = document.querySelectorAll('#application-form input, #application-form select, #application-form textarea');
-    
-    formFields.forEach(field => {
-        // Load saved data
-        const savedValue = localStorage.getItem(`galeria_secreta_form_${field.name}`);
-        if (savedValue && field.type !== 'file' && field.type !== 'checkbox') {
-            field.value = savedValue;
-        }
-        
-        // Save data on change
-        field.addEventListener('input', debounce(function() {
-            if (this.type !== 'file' && this.type !== 'checkbox') {
-                localStorage.setItem(`galeria_secreta_form_${this.name}`, this.value);
-            }
-        }, 500));
-    });
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
-function clearFormAutoSave() {
-    const formFields = document.querySelectorAll('#application-form input, #application-form select, #application-form textarea');
-    formFields.forEach(field => {
-        localStorage.removeItem(`galeria_secreta_form_${field.name}`);
-    });
+function updateUserInterface(usuario) {
+  // Atualizar interface baseado no usuário logado
+  console.log('Usuário logado:', usuario);
+  
+  // Aqui você pode adicionar lógica para mostrar/esconder elementos
+  // baseado no tipo de usuário (admin, modelo, cliente)
 }
 
-// Scroll to Top Button
-function createScrollToTopButton() {
-    const scrollTopBtn = document.createElement('button');
-    scrollTopBtn.innerHTML = '↑';
-    scrollTopBtn.className = 'scroll-top-btn';
-    scrollTopBtn.setAttribute('aria-label', 'Voltar ao topo');
-    
-    document.body.appendChild(scrollTopBtn);
-    
-    scrollTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-}
-
-// Loading Management
-function showLoading(show) {
-    if (loadingOverlay) {
-        if (show) {
-            loadingOverlay.classList.remove('hidden');
-        } else {
-            loadingOverlay.classList.add('hidden');
-        }
-    }
-}
-
-// Notification System
-function showNotification(message, type = 'info') {
-    hideAllNotifications();
-
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">
-                ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
-            </span>
-            <span class="notification-message">${message}</span>
-            <button class="notification-close" aria-label="Fechar notificação">&times;</button>
-        </div>
-    `;
-
-    document.body.appendChild(notification);
-
-    // Show notification
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-
-    // Close functionality
-    const closeBtn = notification.querySelector('.notification-close');
-    closeBtn.addEventListener('click', () => {
-        hideNotification(notification);
-    });
-
-    // Auto hide after 6 seconds
-    setTimeout(() => {
-        hideNotification(notification);
-    }, 6000);
-}
-
-function hideNotification(notification) {
-    if (notification && notification.parentNode) {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 400);
-    }
-}
-
-function hideAllNotifications() {
-    document.querySelectorAll('.notification').forEach(notification => {
-        hideNotification(notification);
-    });
-}
-
-// Utility Functions
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-async function fetchWithRetry(url, options, maxRetries = 3) {
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            const response = await fetch(url, options);
-            return response;
-        } catch (error) {
-            if (i === maxRetries - 1) throw error;
-            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
-        }
-    }
-}
-
-function preloadCriticalResources() {
-    const criticalImages = [
-        'https://images.pexels.com/photos/1722198/pexels-photo-1722198.jpeg'
-    ];
-    
-    criticalImages.forEach(url => {
-        const img = new Image();
-        img.src = url;
-    });
-}
-
-// Performance Monitoring
-function initPerformanceMonitoring() {
-    window.addEventListener('load', () => {
-        const loadTime = performance.now();
-        console.log(`Galeria Secreta loaded in ${loadTime.toFixed(2)}ms`);
-    });
-}
-
-// Error Handling
-window.addEventListener('error', function(e) {
-    console.error('Galeria Secreta Error:', e.error);
-    showNotification('Ocorreu um erro inesperado. Por favor, recarregue a página.', 'error');
+// Tratamento de erros globais
+window.addEventListener('error', (e) => {
+  console.error('Erro global:', e.error);
 });
 
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(error => {
-        console.log('Service Worker registration failed:', error);
-    });
-}
-
-// Initialize performance monitoring
-initPerformanceMonitoring();
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Promise rejeitada:', e.reason);
+});
