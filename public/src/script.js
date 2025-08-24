@@ -438,7 +438,7 @@ function openProfile(profileId) {
     const whatsappBtn = document.getElementById('profile-whatsapp');
     const whatsappMessage = encodeURIComponent(`Olá ${profile.name}! Vi o seu perfil na Galeria Secreta e gostaria de saber mais sobre os seus serviços. Estou interessado em marcar um encontro.`);
     const whatsappNumber = profile.whatsapp.replace(/[^\d]/g, ''); // Remove all non-digits
-    whatsappBtn.href = `https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta}`;
+    whatsappBtn.href = `https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta`;
     
     // Add click tracking for WhatsApp button
     whatsappBtn.addEventListener('click', function(e) {
@@ -1287,22 +1287,13 @@ function clearFormErrors(form) {
 function setupScrollEffects() {
     let lastScrollTop = 0;
     
-                password: formData.get('password'),
-                confirmPassword: formData.get('confirmPassword')
+    window.addEventListener('scroll', debounce(() => {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
         // Navbar scroll effect
         if (navbar) {
             if (scrollTop > 100) {
                 navbar.classList.add('scrolled');
-            if (!data.confirmPassword) {
-                showFieldError('signup-confirm-password', 'Confirmação de palavra-passe é obrigatória');
-                hasErrors = true;
-            } else if (data.password !== data.confirmPassword) {
-                showFieldError('signup-confirm-password', 'As palavras-passe não coincidem');
-                hasErrors = true;
-            }
-            
             } else {
                 navbar.classList.remove('scrolled');
             }
@@ -1311,15 +1302,12 @@ function setupScrollEffects() {
             if (scrollTop > lastScrollTop && scrollTop > 200) {
                 navbar.style.transform = 'translateY(-100%)';
             } else {
-                // Remove confirmPassword from data before sending
-                const { confirmPassword, ...submitData } = data;
-                
-                const response = await fetch('/api/inscricao', {
+                navbar.style.transform = 'translateY(0)';
             }
         }
         
         // Scroll to top button
-                    body: JSON.stringify(submitData),
+        const scrollTopBtn = document.querySelector('.scroll-top-btn');
         if (scrollTopBtn) {
             if (scrollTop > 500) {
                 scrollTopBtn.classList.add('show');
@@ -1328,7 +1316,7 @@ function setupScrollEffects() {
             }
         }
         
-                    showNotification('Inscrição realizada com sucesso! Pode fazer login agora.', 'success');
+        lastScrollTop = scrollTop;
     }, 10));
 }
 
