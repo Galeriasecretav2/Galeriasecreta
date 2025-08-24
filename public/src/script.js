@@ -1287,13 +1287,22 @@ function clearFormErrors(form) {
 function setupScrollEffects() {
     let lastScrollTop = 0;
     
-    window.addEventListener('scroll', debounce(function() {
+                password: formData.get('password'),
+                confirmPassword: formData.get('confirmPassword')
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
         // Navbar scroll effect
         if (navbar) {
             if (scrollTop > 100) {
                 navbar.classList.add('scrolled');
+            if (!data.confirmPassword) {
+                showFieldError('signup-confirm-password', 'Confirmação de palavra-passe é obrigatória');
+                hasErrors = true;
+            } else if (data.password !== data.confirmPassword) {
+                showFieldError('signup-confirm-password', 'As palavras-passe não coincidem');
+                hasErrors = true;
+            }
+            
             } else {
                 navbar.classList.remove('scrolled');
             }
@@ -1302,12 +1311,15 @@ function setupScrollEffects() {
             if (scrollTop > lastScrollTop && scrollTop > 200) {
                 navbar.style.transform = 'translateY(-100%)';
             } else {
-                navbar.style.transform = 'translateY(0)';
+                // Remove confirmPassword from data before sending
+                const { confirmPassword, ...submitData } = data;
+                
+                const response = await fetch('/api/inscricao', {
             }
         }
         
         // Scroll to top button
-        const scrollTopBtn = document.querySelector('.scroll-top-btn');
+                    body: JSON.stringify(submitData),
         if (scrollTopBtn) {
             if (scrollTop > 500) {
                 scrollTopBtn.classList.add('show');
@@ -1316,7 +1328,7 @@ function setupScrollEffects() {
             }
         }
         
-        lastScrollTop = scrollTop;
+                    showNotification('Inscrição realizada com sucesso! Pode fazer login agora.', 'success');
     }, 10));
 }
 

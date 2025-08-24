@@ -444,55 +444,46 @@ app.post('/api/inscricao', async (req, res) => {
     const { 
       nome, 
       email, 
+      password
     } = req.body;
 
     console.log('📄 Dados de inscrição recebidos:', req.body);
 
     // Validação de campos obrigatórios
-    if (!nome || !email || !telefone || !data_nascimento || !genero || !cidade || !provincia || !disponibilidade) {
+    if (!nome || !email || !password) {
       return res.status(400).json({ 
         error: 'Campos obrigatórios ausentes',
-        detalhes: 'Nome, email, telefone, data de nascimento, gênero, cidade, província e disponibilidade são obrigatórios'
+        detalhes: 'Nome, email e palavra-passe são obrigatórios'
       });
     }
 
-    // Validação de idade mínima
-    const birthDate = new Date(data_nascimento);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
+    // Verificar se email já existe
+    const { data: existingUser } = await supabase
+      .from('usuarios')
+      .select('id')
+      .eq('email', email)
+      .single();
 
-    if (age < 18) {
-      return res.status(400).json({
-        error: 'Idade insuficiente',
-        detalhes: 'É necessário ter pelo menos 18 anos para se inscrever'
+    if (existingUser) {
+      return res.status(409).json({
+        error: 'Email já cadastrado',
+        detalhes: 'Este email já está registrado no sistema'
       });
     }
 
-    // Inserção no banco
-    const { data, error } = await supabase.from('inscricoes').insert([
+    // Hash da senha
+    const senhaHash = await bcrypt.hash(password, 12);
+
+    // Inserir usuário
+    const { data, error } = await supabase.from('usuarios').insert([
       {
         nome,
         email,
-        telefone,
-        data_nascimento,
-        genero,
-        cidade,
-        provincia,
-        profissao: profissao || '',
-        experiencia_anterior: experiencia_anterior || false,
-        motivacao: motivacao || '',
-        disponibilidade,
-        termos_aceitos: termos_aceitos || true,
-        newsletter: newsletter || false,
-        status: 'pendente',
-        observacoes: '',
-      },
-    ]);
+        senha_hash: senhaHash,
+        tipo_usuario: 'cliente',
+        ativo: true
+      }
+    ]).select().single();
 
     if (error) {
       console.error('❌ Erro ao salvar inscrição:', error.message);
@@ -511,10 +502,18 @@ app.post('/api/inscricao', async (req, res) => {
       });
     }
 
+    // Log do registro
+    await logLogin(email, data.id, true, 'Registro realizado com sucesso', req);
+
     console.log('✅ Inscrição salva com sucesso');
     return res.status(200).json({
       message: 'Inscrição realizada com sucesso!',
-      data,
+      usuario: {
+        id: data.id,
+        nome: data.nome,
+        email: data.email,
+        tipo_usuario: data.tipo_usuario
+      }
     });
   } catch (err) {
     console.error('❌ Erro geral na inscrição:', err.message, err);
