@@ -261,6 +261,40 @@ function initializeModals() {
     privacyClose.addEventListener('click', () => closeModal(privacyModal));
   }
 
+  // Forgot Password Modal
+  const forgotPasswordModal = document.getElementById('forgot-password-modal');
+  const forgotPasswordClose = document.getElementById('forgot-password-close');
+  const forgotPasswordLink = document.querySelector('.forgot-password');
+
+  if (forgotPasswordLink && forgotPasswordModal) {
+    forgotPasswordLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeModal(loginModal);
+      openModal(forgotPasswordModal);
+    });
+  }
+  if (forgotPasswordClose) {
+    forgotPasswordClose.addEventListener('click', () => closeModal(forgotPasswordModal));
+  }
+
+  // Reset Password Modal
+  const resetPasswordModal = document.getElementById('reset-password-modal');
+  const resetPasswordClose = document.getElementById('reset-password-close');
+
+  if (resetPasswordClose) {
+    resetPasswordClose.addEventListener('click', () => closeModal(resetPasswordModal));
+  }
+
+  // Back to login link
+  const backToLogin = document.getElementById('back-to-login');
+  if (backToLogin) {
+    backToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeModal(forgotPasswordModal);
+      openModal(loginModal);
+    });
+  }
+
   // Switch between login and signup
   const switchToLogin = document.getElementById('switch-to-login');
   if (switchToLogin) {
@@ -348,6 +382,21 @@ function initializeForms() {
       });
     }
   }
+
+  // Forgot Password Form
+  const forgotPasswordForm = document.getElementById('forgot-password-form');
+  if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', handleForgotPassword);
+  }
+
+  // Reset Password Form
+  const resetPasswordForm = document.getElementById('reset-password-form');
+  if (resetPasswordForm) {
+    resetPasswordForm.addEventListener('submit', handleResetPassword);
+  }
+
+  // Verificar se há token de reset na URL
+  checkResetToken();
 }
 
 // Handlers dos formulários
@@ -493,6 +542,166 @@ async function handleSignup(e) {
     showNotification('Erro de conexão. Tente novamente.', 'error');
   } finally {
     setButtonLoading(submitBtn, false);
+  }
+}
+
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Limpar erros anteriores
+  clearFormErrors(form);
+  
+  // Validação
+  const email = formData.get('email')?.trim();
+  
+  if (!email || !isValidEmail(email)) {
+    showFormError(form, 'email', 'Email inválido');
+    return;
+  }
+  
+  // Loading state
+  setButtonLoading(submitBtn, true);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showNotification('Instruções enviadas! Verifique seu email.', 'success');
+      
+      // Fechar modal
+      const modal = document.getElementById('forgot-password-modal');
+      closeModal(modal);
+      
+    } else {
+      showNotification(data.error || 'Erro ao enviar instruções', 'error');
+    }
+    
+  } catch (error) {
+    console.error('Erro no forgot password:', error);
+    showNotification('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+}
+
+async function handleResetPassword(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Limpar erros anteriores
+  clearFormErrors(form);
+  
+  // Validação
+  const novaSenha = formData.get('novaSenha');
+  const confirmarSenha = formData.get('confirmarSenha');
+  
+  let hasErrors = false;
+  
+  if (!novaSenha || novaSenha.length < 6) {
+    showFormError(form, 'novaSenha', 'Nova senha deve ter pelo menos 6 caracteres');
+    hasErrors = true;
+  }
+  
+  if (novaSenha !== confirmarSenha) {
+    showFormError(form, 'confirmarSenha', 'Senhas não coincidem');
+    hasErrors = true;
+  }
+  
+  if (hasErrors) return;
+  
+  // Loading state
+  setButtonLoading(submitBtn, true);
+  
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        novaSenha
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showNotification('Senha redefinida com sucesso!', 'success');
+      
+      // Fechar modal e limpar URL
+      const modal = document.getElementById('reset-password-modal');
+      closeModal(modal);
+      
+      // Limpar parâmetros da URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Abrir modal de login após um tempo
+      setTimeout(() => {
+        const loginModal = document.getElementById('login-modal');
+        openModal(loginModal);
+      }, 2000);
+      
+    } else {
+      showNotification(data.error || 'Erro ao redefinir senha', 'error');
+    }
+    
+  } catch (error) {
+    console.error('Erro no reset password:', error);
+    showNotification('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+}
+
+// Verificar token de reset na URL
+async function checkResetToken() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  
+  if (token) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/verify-reset-token/${token}`);
+      const data = await response.json();
+      
+      if (response.ok && data.valid) {
+        // Token válido - mostrar modal de reset
+        const resetModal = document.getElementById('reset-password-modal');
+        const userEmailElement = document.getElementById('reset-user-email');
+        
+        if (userEmailElement) {
+          userEmailElement.textContent = data.usuario.email;
+        }
+        
+        openModal(resetModal);
+      } else {
+        // Token inválido
+        showNotification('Link de redefinição inválido ou expirado.', 'error');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar token:', error);
+      showNotification('Erro ao verificar link de redefinição.', 'error');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }
 }
 
