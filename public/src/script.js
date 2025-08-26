@@ -277,6 +277,14 @@ function initializeModals() {
     forgotPasswordClose.addEventListener('click', () => closeModal(forgotPasswordModal));
   }
 
+  // Verify Code Modal
+  const verifyCodeModal = document.getElementById('verify-code-modal');
+  const verifyCodeClose = document.getElementById('verify-code-close');
+
+  if (verifyCodeClose) {
+    verifyCodeClose.addEventListener('click', () => closeModal(verifyCodeModal));
+  }
+
   // Reset Password Modal
   const resetPasswordModal = document.getElementById('reset-password-modal');
   const resetPasswordClose = document.getElementById('reset-password-close');
@@ -292,6 +300,25 @@ function initializeModals() {
       e.preventDefault();
       closeModal(forgotPasswordModal);
       openModal(loginModal);
+    });
+  }
+
+  // Back to forgot password link
+  const backToForgot = document.getElementById('back-to-forgot');
+  if (backToForgot) {
+    backToForgot.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeModal(verifyCodeModal);
+      openModal(forgotPasswordModal);
+    });
+  }
+
+  // Resend code link
+  const resendCode = document.getElementById('resend-code');
+  if (resendCode) {
+    resendCode.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleResendCode();
     });
   }
 
@@ -389,13 +416,40 @@ function initializeForms() {
     forgotPasswordForm.addEventListener('submit', handleForgotPassword);
   }
 
+  // Verify Code Form
+  const verifyCodeForm = document.getElementById('verify-code-form');
+  if (verifyCodeForm) {
+    verifyCodeForm.addEventListener('submit', handleVerifyCode);
+    
+    // Auto-format code input
+    const codeInput = document.getElementById('reset-code');
+    if (codeInput) {
+      codeInput.addEventListener('input', (e) => {
+        // Remove non-numeric characters
+        e.target.value = e.target.value.replace(/\D/g, '');
+        
+        // Limit to 6 digits
+        if (e.target.value.length > 6) {
+          e.target.value = e.target.value.slice(0, 6);
+        }
+      });
+      
+      codeInput.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        const numericPaste = paste.replace(/\D/g, '').slice(0, 6);
+        e.target.value = numericPaste;
+      });
+    }
+  }
+
   // Reset Password Form
   const resetPasswordForm = document.getElementById('reset-password-form');
   if (resetPasswordForm) {
     resetPasswordForm.addEventListener('submit', handleResetPassword);
   }
 
-  // Verificar se há token de reset na URL
+  // Verificar se há token de reset na URL (sistema antigo)
   checkResetToken();
 }
 
@@ -578,14 +632,29 @@ async function handleForgotPassword(e) {
     const data = await response.json();
     
     if (response.ok) {
-      showNotification('Instruções enviadas! Verifique seu email.', 'success');
+      showNotification('Código enviado! Verifique seu email.', 'success');
       
-      // Fechar modal
+      // Fechar modal de forgot password e abrir modal de verificação
       const modal = document.getElementById('forgot-password-modal');
       closeModal(modal);
       
+      // Abrir modal de verificação de código
+      const verifyModal = document.getElementById('verify-code-modal');
+      const emailDisplay = document.getElementById('verify-code-email');
+      if (emailDisplay) {
+        emailDisplay.textContent = email;
+      }
+      
+      // Iniciar countdown
+      startCodeCountdown();
+      
+      // Salvar email para uso posterior
+      window.resetEmail = email;
+      
+      openModal(verifyModal);
+      
     } else {
-      showNotification(data.error || 'Erro ao enviar instruções', 'error');
+      showNotification(data.error || 'Erro ao enviar código', 'error');
     }
     
   } catch (error) {
@@ -594,6 +663,156 @@ async function handleForgotPassword(e) {
   } finally {
     setButtonLoading(submitBtn, false);
   }
+}
+
+// Handler para verificar código
+async function handleVerifyCode(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  // Limpar erros anteriores
+  clearFormErrors(form);
+  
+  // Validação
+  const codigo = formData.get('codigo')?.trim();
+  const email = window.resetEmail;
+  
+  if (!codigo || codigo.length !== 6) {
+    showFormError(form, 'codigo', 'Código deve ter 6 dígitos');
+    return;
+  }
+  
+  if (!email) {
+    showNotification('Erro: Email não encontrado. Tente novamente.', 'error');
+    return;
+  }
+  
+  // Loading state
+  setButtonLoading(submitBtn, true);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/verify-reset-code`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, codigo })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok && data.valid) {
+      showNotification('Código verificado com sucesso!', 'success');
+      
+      // Fechar modal de verificação
+      const verifyModal = document.getElementById('verify-code-modal');
+      closeModal(verifyModal);
+      
+      // Abrir modal de redefinição de senha
+      const resetModal = document.getElementById('reset-password-modal');
+      const userEmailElement = document.getElementById('reset-user-email');
+      
+      if (userEmailElement) {
+        userEmailElement.textContent = email;
+      }
+      
+      // Salvar código para uso na redefinição
+      window.resetCode = codigo;
+      
+      openModal(resetModal);
+      
+    } else {
+      // Incrementar tentativas no servidor
+      await fetch(`${API_BASE_URL}/api/increment-code-attempts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, codigo })
+      });
+      
+      showFormError(form, 'codigo', data.error || 'Código inválido');
+    }
+    
+  } catch (error) {
+    console.error('Erro na verificação do código:', error);
+    showNotification('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading(submitBtn, false);
+  }
+}
+
+// Handler para reenviar código
+async function handleResendCode() {
+  const email = window.resetEmail;
+  
+  if (!email) {
+    showNotification('Erro: Email não encontrado.', 'error');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showNotification('Novo código enviado!', 'success');
+      
+      // Reiniciar countdown
+      startCodeCountdown();
+      
+      // Limpar campo de código
+      const codeInput = document.getElementById('reset-code');
+      if (codeInput) {
+        codeInput.value = '';
+      }
+      
+    } else {
+      showNotification(data.error || 'Erro ao reenviar código', 'error');
+    }
+    
+  } catch (error) {
+    console.error('Erro ao reenviar código:', error);
+    showNotification('Erro de conexão. Tente novamente.', 'error');
+  }
+}
+
+// Função para iniciar countdown do código
+function startCodeCountdown() {
+  const countdownElement = document.getElementById('code-countdown');
+  if (!countdownElement) return;
+  
+  let timeLeft = 15 * 60; // 15 minutos em segundos
+  
+  // Limpar countdown anterior se existir
+  if (window.countdownInterval) {
+    clearInterval(window.countdownInterval);
+  }
+  
+  window.countdownInterval = setInterval(() => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    
+    countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (timeLeft <= 0) {
+      clearInterval(window.countdownInterval);
+      countdownElement.textContent = 'Expirado';
+      countdownElement.style.color = '#dc3545';
+    }
+    
+    timeLeft--;
+  }, 1000);
 }
 
 async function handleResetPassword(e) {
@@ -609,6 +828,8 @@ async function handleResetPassword(e) {
   // Validação
   const novaSenha = formData.get('novaSenha');
   const confirmarSenha = formData.get('confirmarSenha');
+  const email = window.resetEmail;
+  const codigo = window.resetCode;
   
   let hasErrors = false;
   
@@ -622,22 +843,25 @@ async function handleResetPassword(e) {
     hasErrors = true;
   }
   
+  if (!email || !codigo) {
+    showNotification('Erro: Dados de verificação não encontrados. Tente novamente.', 'error');
+    return;
+  }
+  
   if (hasErrors) return;
   
   // Loading state
   setButtonLoading(submitBtn, true);
   
   try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    
-    const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/reset-password-with-code`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token,
+        email,
+        codigo,
         novaSenha
       })
     });
@@ -647,12 +871,18 @@ async function handleResetPassword(e) {
     if (response.ok) {
       showNotification('Senha redefinida com sucesso!', 'success');
       
-      // Fechar modal e limpar URL
+      // Fechar modal e limpar dados temporários
       const modal = document.getElementById('reset-password-modal');
       closeModal(modal);
       
-      // Limpar parâmetros da URL
-      window.history.replaceState({}, document.title, window.location.pathname);
+      // Limpar dados temporários
+      window.resetEmail = null;
+      window.resetCode = null;
+      
+      // Limpar countdown
+      if (window.countdownInterval) {
+        clearInterval(window.countdownInterval);
+      }
       
       // Abrir modal de login após um tempo
       setTimeout(() => {
@@ -678,6 +908,11 @@ async function checkResetToken() {
   const token = urlParams.get('token');
   
   if (token) {
+    // Sistema antigo - mostrar aviso de atualização
+    showNotification('Sistema atualizado! Use o novo sistema de código de 6 dígitos.', 'info');
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+    
     try {
       const response = await fetch(`${API_BASE_URL}/api/verify-reset-token/${token}`);
       const data = await response.json();
