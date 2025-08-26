@@ -101,16 +101,40 @@ const logLogin = async (email, usuarioId, sucesso, motivo, req) => {
   }
 };
 
-// Função para enviar email (simulação - você pode integrar com um serviço real)
-const enviarEmailReset = async (email, token, nome) => {
-  // Aqui você integraria com um serviço de email como SendGrid, Mailgun, etc.
-  // Por enquanto, vamos apenas logar o token para desenvolvimento
-  console.log(`📧 Email de reset para ${email}:`);
-  console.log(`🔗 Link de reset: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`);
-  console.log(`👤 Nome: ${nome}`);
-  
-  // Simular envio bem-sucedido
-  return Promise.resolve(true);
+// Função para gerar código de 6 dígitos
+const gerarCodigoReset = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Função para enviar código por email via Supabase Edge Function
+const enviarCodigoReset = async (email, codigo, nome) => {
+  try {
+    const response = await fetch(`${process.env.SUPABASE_URL}/functions/v1/send-reset-code`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        code: codigo,
+        nome
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Erro ao enviar email:', error);
+      return false;
+    }
+
+    const result = await response.json();
+    console.log('✅ Email enviado com sucesso:', result);
+    return true;
+  } catch (error) {
+    console.error('❌ Erro ao enviar email:', error);
+    return false;
+  }
 };
 
 // Rota de registro
@@ -205,7 +229,7 @@ app.post('/api/forgot-password', resetLimiter, async (req, res) => {
     if (error || !usuario) {
       console.log('❌ Usuário não encontrado:', email);
       return res.status(200).json({ 
-        message: 'Se o email existir em nosso sistema, você receberá instruções para redefinir sua senha.' 
+        message: 'Se o email existir em nosso sistema, você receberá um código para redefinir sua senha.' 
       });
     }
 
@@ -213,41 +237,53 @@ app.post('/api/forgot-password', resetLimiter, async (req, res) => {
     if (!usuario.ativo) {
       console.log('❌ Usuário inativo:', email);
       return res.status(200).json({ 
-        message: 'Se o email existir em nosso sistema, você receberá instruções para redefinir sua senha.' 
+        message: 'Se o email existir em nosso sistema, você receberá um código para redefinir sua senha.' 
       });
     }
 
-    // Gerar token de reset
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetExpira = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+    // Gerar código de 6 dígitos
+    const codigo = gerarCodigoReset();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
-    // Salvar token no banco
-    const { error: updateError } = await supabase
-      .from('usuarios')
-      .update({ 
-        token_reset: resetToken,
-        token_reset_expira: resetExpira.toISOString()
-      })
-      .eq('id', usuario.id);
+    // Invalidar códigos anteriores do usuário
+    await supabase
+      .from('reset_codes')
+      .update({ usado: true })
+      .eq('email', email)
+      .eq('usado', false);
 
-    if (updateError) {
-      console.error('❌ Erro ao salvar token:', updateError);
+    // Salvar novo código no banco
+    const { error: insertError } = await supabase
+      .from('reset_codes')
+      .insert([{
+        usuario_id: usuario.id,
+        email,
+        codigo,
+        expires_at: expiresAt.toISOString()
+      }]);
+
+    if (insertError) {
+      console.error('❌ Erro ao salvar código:', insertError);
       return res.status(500).json({ 
         error: 'Erro interno do servidor' 
       });
     }
 
-    // Enviar email
+    // Enviar código por email
     try {
-      await enviarEmailReset(email, resetToken, usuario.nome);
-      console.log('✅ Email de reset enviado para:', email);
+      const emailEnviado = await enviarCodigoReset(email, codigo, usuario.nome);
+      if (emailEnviado) {
+        console.log('✅ Código de reset enviado para:', email);
+      } else {
+        console.log('⚠️ Falha ao enviar email, mas código foi salvo');
+      }
     } catch (emailError) {
       console.error('❌ Erro ao enviar email:', emailError);
       // Não falhar a requisição se o email não for enviado
     }
 
     return res.status(200).json({
-      message: 'Se o email existir em nosso sistema, você receberá instruções para redefinir sua senha.'
+      message: 'Se o email existir em nosso sistema, você receberá um código para redefinir sua senha.'
     });
   } catch (err) {
     console.error('❌ Erro geral no forgot-password:', err);
@@ -257,63 +293,114 @@ app.post('/api/forgot-password', resetLimiter, async (req, res) => {
   }
 });
 
-// Rota para verificar token de reset
-app.get('/api/verify-reset-token/:token', async (req, res) => {
+// Rota para verificar código de reset
+app.post('/api/verify-reset-code', async (req, res) => {
   try {
-    console.log('📨 GET /api/verify-reset-token');
-    const { token } = req.params;
+    console.log('📨 POST /api/verify-reset-code');
+    const { email, codigo } = req.body;
 
-    if (!token) {
+    if (!email || !codigo) {
       return res.status(400).json({ 
-        error: 'Token é obrigatório' 
+        error: 'Email e código são obrigatórios' 
       });
     }
 
-    // Buscar usuário com o token
-    const { data: usuario, error } = await supabase
-      .from('usuarios')
-      .select('id, nome, email, token_reset_expira')
-      .eq('token_reset', token)
+    // Buscar código válido
+    const { data: resetCode, error } = await supabase
+      .from('reset_codes')
+      .select(`
+        *,
+        usuarios(id, nome, email)
+      `)
+      .eq('email', email)
+      .eq('codigo', codigo)
+      .eq('usado', false)
+      .gt('expires_at', new Date().toISOString())
       .single();
 
-    if (error || !usuario) {
+    if (error || !resetCode) {
       return res.status(400).json({ 
-        error: 'Token inválido ou expirado' 
+        error: 'Código inválido ou expirado' 
       });
     }
 
-    // Verificar se token não expirou
-    if (new Date(usuario.token_reset_expira) < new Date()) {
+    // Verificar tentativas (máximo 3)
+    if (resetCode.tentativas >= 3) {
+      // Marcar código como usado após 3 tentativas
+      await supabase
+        .from('reset_codes')
+        .update({ usado: true })
+        .eq('id', resetCode.id);
+        
       return res.status(400).json({ 
-        error: 'Token expirado' 
+        error: 'Muitas tentativas. Solicite um novo código.' 
       });
     }
 
     return res.status(200).json({
       valid: true,
-      usuario: {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email
-      }
+      resetCode: {
+        id: resetCode.id,
+        email: resetCode.email
+      },
+      usuario: resetCode.usuarios
     });
   } catch (err) {
-    console.error('❌ Erro ao verificar token:', err);
+    console.error('❌ Erro ao verificar código:', err);
     return res.status(500).json({ 
       error: 'Erro interno do servidor' 
     });
   }
 });
 
-// Rota para redefinir senha
-app.post('/api/reset-password', async (req, res) => {
+// Rota para incrementar tentativas de código
+app.post('/api/increment-code-attempts', async (req, res) => {
   try {
-    console.log('📨 POST /api/reset-password');
-    const { token, novaSenha } = req.body;
+    const { email, codigo } = req.body;
 
-    if (!token || !novaSenha) {
+    if (!email || !codigo) {
       return res.status(400).json({ 
-        error: 'Token e nova senha são obrigatórios' 
+        error: 'Email e código são obrigatórios' 
+      });
+    }
+
+    // Incrementar tentativas
+    const { error } = await supabase
+      .from('reset_codes')
+      .update({ 
+        tentativas: supabase.raw('tentativas + 1')
+      })
+      .eq('email', email)
+      .eq('codigo', codigo)
+      .eq('usado', false);
+
+    if (error) {
+      console.error('❌ Erro ao incrementar tentativas:', error);
+      return res.status(500).json({ 
+        error: 'Erro interno do servidor' 
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Tentativa registrada'
+    });
+  } catch (err) {
+    console.error('❌ Erro ao incrementar tentativas:', err);
+    return res.status(500).json({ 
+      error: 'Erro interno do servidor' 
+    });
+  }
+});
+
+// Rota para redefinir senha com código
+app.post('/api/reset-password-with-code', async (req, res) => {
+  try {
+    console.log('📨 POST /api/reset-password-with-code');
+    const { email, codigo, novaSenha } = req.body;
+
+    if (!email || !codigo || !novaSenha) {
+      return res.status(400).json({ 
+        error: 'Email, código e nova senha são obrigatórios' 
       });
     }
 
@@ -323,41 +410,50 @@ app.post('/api/reset-password', async (req, res) => {
       });
     }
 
-    // Buscar usuário com o token
-    const { data: usuario, error } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('token_reset', token)
+    // Buscar e validar código
+    const { data: resetCode, error: codeError } = await supabase
+      .from('reset_codes')
+      .select(`
+        *,
+        usuarios(*)
+      `)
+      .eq('email', email)
+      .eq('codigo', codigo)
+      .eq('usado', false)
+      .gt('expires_at', new Date().toISOString())
       .single();
 
-    if (error || !usuario) {
+    if (codeError || !resetCode) {
       return res.status(400).json({ 
-        error: 'Token inválido ou expirado' 
+        error: 'Código inválido ou expirado' 
       });
     }
 
-    // Verificar se token não expirou
-    if (new Date(usuario.token_reset_expira) < new Date()) {
+    // Verificar tentativas
+    if (resetCode.tentativas >= 3) {
+      await supabase
+        .from('reset_codes')
+        .update({ usado: true })
+        .eq('id', resetCode.id);
+        
       return res.status(400).json({ 
-        error: 'Token expirado' 
+        error: 'Muitas tentativas. Solicite um novo código.' 
       });
     }
 
     // Hash da nova senha
     const novaSenhaHash = await bcrypt.hash(novaSenha, 12);
 
-    // Atualizar senha e limpar token
+    // Atualizar senha do usuário
     const { error: updateError } = await supabase
       .from('usuarios')
       .update({ 
         senha_hash: novaSenhaHash,
-        token_reset: null,
-        token_reset_expira: null,
         tentativas_login: 0,
         bloqueado_ate: null,
         updated_at: new Date().toISOString()
       })
-      .eq('id', usuario.id);
+      .eq('id', resetCode.usuarios.id);
 
     if (updateError) {
       console.error('❌ Erro ao atualizar senha:', updateError);
@@ -366,15 +462,78 @@ app.post('/api/reset-password', async (req, res) => {
       });
     }
 
-    // Log da redefinição
-    await logLogin(usuario.email, usuario.id, true, 'Senha redefinida com sucesso', req);
+    // Marcar código como usado
+    await supabase
+      .from('reset_codes')
+      .update({ usado: true })
+      .eq('id', resetCode.id);
 
-    console.log('✅ Senha redefinida com sucesso para:', usuario.email);
+    // Log da redefinição
+    await logLogin(email, resetCode.usuarios.id, true, 'Senha redefinida com código', req);
+
+    console.log('✅ Senha redefinida com sucesso para:', email);
     return res.status(200).json({
       message: 'Senha redefinida com sucesso!'
     });
   } catch (err) {
-    console.error('❌ Erro geral no reset-password:', err);
+    console.error('❌ Erro geral no reset-password-with-code:', err);
+    return res.status(500).json({ 
+      error: 'Erro interno do servidor' 
+    });
+  }
+});
+
+// Manter rota antiga para compatibilidade (deprecated)
+app.get('/api/verify-reset-token/:token', async (req, res) => {
+  try {
+    console.log('📨 GET /api/verify-reset-token (deprecated)');
+    return res.status(400).json({ 
+      error: 'Esta funcionalidade foi atualizada. Use o sistema de código de 6 dígitos.' 
+    });
+  } catch (err) {
+    console.error('❌ Erro ao verificar token:', err);
+    return res.status(500).json({ 
+      error: 'Erro interno do servidor' 
+    });
+  }
+});
+
+// Manter rota antiga para compatibilidade (deprecated)
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    console.log('📨 POST /api/reset-password (deprecated)');
+    return res.status(400).json({ 
+      error: 'Esta funcionalidade foi atualizada. Use o sistema de código de 6 dígitos.' 
+    });
+  } catch (err) {
+    console.error('❌ Erro no reset password:', err);
+    return res.status(500).json({ 
+      error: 'Erro interno do servidor' 
+    });
+  }
+});
+
+// Rota para limpar códigos expirados (pode ser chamada por um cron job)
+app.post('/api/cleanup-expired-codes', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('reset_codes')
+      .delete()
+      .lt('expires_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()); // Códigos expirados há mais de 1 hora
+
+    if (error) {
+      console.error('❌ Erro ao limpar códigos:', error);
+      return res.status(500).json({ 
+        error: 'Erro ao limpar códigos expirados' 
+      });
+    }
+
+    console.log('✅ Códigos expirados limpos');
+    return res.status(200).json({
+      message: 'Códigos expirados removidos com sucesso'
+    });
+  } catch (err) {
+    console.error('❌ Erro geral na limpeza:', err);
     return res.status(500).json({ 
       error: 'Erro interno do servidor' 
     });
