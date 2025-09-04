@@ -195,9 +195,16 @@ Somos uma irmandade comprometida com a excelência!`
     
     if (chatInput) {
       chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
           this.sendMessage();
         }
+      });
+      
+      // Auto-resize textarea
+      chatInput.addEventListener('input', (e) => {
+        e.target.style.height = 'auto';
+        e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
       });
     }
     

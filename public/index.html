@@ -533,6 +533,86 @@
         </div>
     </footer>
 
+    <!-- AI Chat Widget -->
+    <div id="ai-chat-widget" class="ai-chat-widget">
+      <!-- Chat Toggle Button -->
+      <button id="chat-toggle" class="chat-toggle" title="Assistência Virtual">
+        <span class="chat-toggle-icon">🤖</span>
+        <div id="chat-notification" class="chat-notification"></div>
+      </button>
+
+      <!-- Chat Window -->
+      <div id="chat-window" class="chat-window hidden">
+        <!-- Chat Header -->
+        <div class="chat-header">
+          <div class="chat-header-info">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-header-text">
+              <h3>Assistente Virtual</h3>
+              <p>Galeria Secreta</p>
+            </div>
+          </div>
+          <button id="chat-close" class="chat-close">×</button>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="chat-messages">
+          <div class="welcome-message">
+            <h4>👋 Bem-vindo!</h4>
+            <p>Sou seu assistente virtual da Galeria Secreta. Como posso ajudá-lo hoje?</p>
+            
+            <div class="quick-actions">
+              <button class="quick-action" data-question="Como me candidatar?">
+                Como me candidatar?
+              </button>
+              <button class="quick-action" data-question="Quais são os requisitos?">
+                Requisitos
+              </button>
+              <button class="quick-action" data-question="Quanto posso ganhar?">
+                Ganhos
+              </button>
+              <button class="quick-action" data-question="É seguro?">
+                Segurança
+              </button>
+              <button class="quick-action" data-question="Como entrar em contacto?">
+                Contacto
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="chat-typing" class="chat-typing">
+          <div class="message-avatar">
+            <div class="chat-avatar">🤖</div>
+          </div>
+          <div class="message-content">
+            <span>Digitando</span>
+            <div class="typing-dots">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area">
+          <div class="chat-input-container">
+            <textarea 
+              id="chat-input" 
+              class="chat-input" 
+              placeholder="Digite sua pergunta..."
+              rows="1"
+            ></textarea>
+            <button id="chat-send" class="chat-send" title="Enviar mensagem">
+              ➤
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     
     <!-- Login Modal -->
     <div id="login-modal" class="modal hidden" role="dialog" aria-labelledby="login-title" aria-modal="true">
