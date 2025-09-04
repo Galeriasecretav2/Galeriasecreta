@@ -1225,6 +1225,13 @@ body {
     margin: 0;
 }
 
+.support-option-subtitle {
+  font-size: 12px !important;
+  color: #999 !important;
+  font-style: italic;
+  margin-top: 2px !important;
+}
+
 .support-hours {
     padding-top: var(--spacing-lg);
     border-top: 1px solid var(--border-color);
