@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeForms();
   initializeButtons();
   initializeScrollEffects();
+  initializeVirtualAssistant();
 });
 
 // Navegação
@@ -1191,6 +1192,312 @@ function initializeScrollEffects() {
       heroBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
     }
   });
+}
+
+// Virtual Assistant
+function initializeVirtualAssistant() {
+  const assistantToggle = document.getElementById('assistant-toggle');
+  const virtualAssistant = document.getElementById('virtual-assistant');
+  const closeAssistant = document.getElementById('close-assistant');
+  const minimizeAssistant = document.getElementById('minimize-assistant');
+  const chatInput = document.getElementById('chat-input');
+  const sendButton = document.getElementById('send-message');
+  const chatMessages = document.getElementById('chat-messages');
+  const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+  const charCounter = document.querySelector('.char-counter');
+  const typingIndicator = document.querySelector('.typing-indicator');
+
+  let isAssistantOpen = false;
+  let isMinimized = false;
+  let messageCount = 0;
+
+  // Toggle assistant
+  if (assistantToggle) {
+    assistantToggle.addEventListener('click', () => {
+      toggleAssistant();
+    });
+  }
+
+  // Close assistant
+  if (closeAssistant) {
+    closeAssistant.addEventListener('click', () => {
+      closeAssistantChat();
+    });
+  }
+
+  // Minimize assistant
+  if (minimizeAssistant) {
+    minimizeAssistant.addEventListener('click', () => {
+      toggleMinimize();
+    });
+  }
+
+  // Send message
+  if (sendButton && chatInput) {
+    sendButton.addEventListener('click', () => {
+      sendMessage();
+    });
+
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Character counter
+    chatInput.addEventListener('input', () => {
+      const length = chatInput.value.length;
+      if (charCounter) {
+        charCounter.textContent = `${length}/500`;
+        charCounter.style.color = length > 450 ? '#dc3545' : '#6c757d';
+      }
+    });
+  }
+
+  // Quick actions
+  quickActionBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.getAttribute('data-action');
+      handleQuickAction(action);
+    });
+  });
+
+  function toggleAssistant() {
+    if (isAssistantOpen) {
+      closeAssistantChat();
+    } else {
+      openAssistantChat();
+    }
+  }
+
+  function openAssistantChat() {
+    if (virtualAssistant) {
+      virtualAssistant.classList.remove('hidden');
+      isAssistantOpen = true;
+      updateToggleButton();
+      
+      // Focus no input após abrir
+      setTimeout(() => {
+        if (chatInput) chatInput.focus();
+      }, 300);
+    }
+  }
+
+  function closeAssistantChat() {
+    if (virtualAssistant) {
+      virtualAssistant.classList.add('hidden');
+      isAssistantOpen = false;
+      isMinimized = false;
+      virtualAssistant.classList.remove('minimized');
+      updateToggleButton();
+    }
+  }
+
+  function toggleMinimize() {
+    if (virtualAssistant) {
+      isMinimized = !isMinimized;
+      virtualAssistant.classList.toggle('minimized', isMinimized);
+      
+      const minimizeBtn = document.getElementById('minimize-assistant');
+      if (minimizeBtn) {
+        minimizeBtn.innerHTML = isMinimized ? '<span>□</span>' : '<span>−</span>';
+      }
+    }
+  }
+
+  function updateToggleButton() {
+    const iconChat = assistantToggle?.querySelector('.icon-chat');
+    const iconClose = assistantToggle?.querySelector('.icon-close');
+    
+    if (iconChat && iconClose) {
+      if (isAssistantOpen) {
+        iconChat.classList.add('hidden');
+        iconClose.classList.remove('hidden');
+      } else {
+        iconChat.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      }
+    }
+  }
+
+  function sendMessage() {
+    const message = chatInput?.value.trim();
+    if (!message) return;
+
+    // Adicionar mensagem do usuário
+    addMessage(message, 'user');
+    
+    // Limpar input
+    if (chatInput) {
+      chatInput.value = '';
+      if (charCounter) charCounter.textContent = '0/500';
+    }
+
+    // Mostrar indicador de digitação
+    showTypingIndicator();
+
+    // Simular resposta da IA
+    setTimeout(() => {
+      const response = generateAIResponse(message);
+      hideTypingIndicator();
+      addMessage(response, 'assistant');
+    }, 1500 + Math.random() * 1000);
+  }
+
+  function handleQuickAction(action) {
+    const quickResponses = {
+      candidatura: "Para se candidatar à Galeria Secreta, você precisa preencher nosso formulário de candidatura. Clique no botão 'Quero Fazer Parte' na página principal. O processo inclui pré-entrevista, entrevista presencial, teste prático e sessão fotográfica.",
+      requisitos: "Os requisitos são: ter 18 anos ou mais, residir em Moçambique, ser educada e discreta, extrovertida, ter higiene impecável e tomar a decisão de forma consciente e voluntária.",
+      ganhos: "Os ganhos variam conforme sua experiência: Iniciante (1.500-4.000 MT), Experiente (4.000-7.000 MT), Profissional (acima de 8.000 MT). Você define seu valor e o pagamento é 100% seu.",
+      processo: "O processo tem 6 etapas: 1) Pré-entrevista (chat), 2) Entrevista presencial, 3) Teste prático, 4) Sessão fotográfica, 5) Criação do perfil, 6) Aceitação na associação."
+    };
+
+    const response = quickResponses[action] || "Desculpe, não entendi sua solicitação. Pode reformular a pergunta?";
+    
+    // Mostrar indicador de digitação
+    showTypingIndicator();
+
+    setTimeout(() => {
+      hideTypingIndicator();
+      addMessage(response, 'assistant');
+    }, 800);
+  }
+
+  function addMessage(content, sender) {
+    if (!chatMessages) return;
+
+    messageCount++;
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const avatar = sender === 'user' ? '👤' : '🤖';
+    const time = new Date().toLocaleTimeString('pt-PT', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+
+    messageDiv.innerHTML = `
+      <div class="message-avatar">${avatar}</div>
+      <div class="message-content">
+        <p>${content}</p>
+        <div class="message-time">${time}</div>
+      </div>
+    `;
+
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll para a última mensagem
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Remover ações rápidas após primeira interação
+    if (messageCount > 2) {
+      const quickActions = document.querySelector('.quick-actions');
+      if (quickActions) {
+        quickActions.style.display = 'none';
+      }
+    }
+  }
+
+  function showTypingIndicator() {
+    if (typingIndicator) {
+      typingIndicator.classList.remove('hidden');
+    }
+  }
+
+  function hideTypingIndicator() {
+    if (typingIndicator) {
+      typingIndicator.classList.add('hidden');
+    }
+  }
+
+  function generateAIResponse(userMessage) {
+    const message = userMessage.toLowerCase();
+    
+    // Respostas baseadas em palavras-chave
+    if (message.includes('candidat') || message.includes('inscrev') || message.includes('aplicar')) {
+      return "Para se candidatar, clique em 'Quero Fazer Parte' na página principal. Você passará por um processo seletivo que inclui entrevista e sessão fotográfica. Precisa ter mais de 18 anos e residir em Moçambique.";
+    }
+    
+    if (message.includes('requisito') || message.includes('preciso') || message.includes('necessário')) {
+      return "Os requisitos principais são: ter 18+ anos, residir em Moçambique, ser educada e discreta, extrovertida, ter excelente higiene e tomar a decisão de forma consciente. Não aceitamos menores de idade.";
+    }
+    
+    if (message.includes('ganho') || message.includes('dinheiro') || message.includes('pagamento') || message.includes('salário')) {
+      return "Os ganhos dependem da sua experiência: Iniciante (1.500-4.000 MT), Experiente (4.000-7.000 MT), Profissional (8.000+ MT). Você define seu valor e recebe 100% do pagamento. Ajudamos a encontrar o posicionamento ideal.";
+    }
+    
+    if (message.includes('processo') || message.includes('etapa') || message.includes('como funciona')) {
+      return "O processo tem 6 etapas: 1) Pré-entrevista por chat, 2) Entrevista presencial, 3) Teste prático, 4) Sessão fotográfica profissional, 5) Criação do seu perfil, 6) Aceitação na nossa associação.";
+    }
+    
+    if (message.includes('idade') || message.includes('anos')) {
+      return "A idade mínima é 18 anos. Não aceitamos menores de idade sob nenhuma circunstância. A idade máxima para candidatura é 65 anos.";
+    }
+    
+    if (message.includes('local') || message.includes('onde') || message.includes('moçambique')) {
+      return "Atualmente operamos em Moçambique. É obrigatório residir no país para se candidatar. Nossa base principal é em Nampula, mas atendemos todo o território nacional.";
+    }
+    
+    if (message.includes('segur') || message.includes('proteg') || message.includes('risco')) {
+      return "A segurança é nossa prioridade máxima. Somos contra exploração sexual, não somos cafetinas nem bordel. Aqui o poder está nas suas mãos. Oferecemos ambiente seguro, discreto e profissional.";
+    }
+    
+    if (message.includes('experiência') || message.includes('iniciante') || message.includes('primeira vez')) {
+      return "Aceitamos iniciantes! Oferecemos mentoria personalizada, treinamentos, acesso ao closet exclusivo e curso de inglês. Nossa equipe te ajuda a desenvolver confiança e profissionalismo.";
+    }
+    
+    if (message.includes('contacto') || message.includes('telefone') || message.includes('whatsapp')) {
+      return "Pode entrar em contacto connosco pelo telefone +258 851551556 ou email galeriasecretamz@gmail.com. Horário de atendimento: Segunda a Sexta, 9h às 18h.";
+    }
+    
+    if (message.includes('obrigad') || message.includes('valeu') || message.includes('thanks')) {
+      return "De nada! Fico feliz em ajudar. Se tiver mais dúvidas sobre a Galeria Secreta, estarei aqui. Lembre-se: somos uma família de mulheres independentes e profissionais! 😊";
+    }
+    
+    if (message.includes('olá') || message.includes('oi') || message.includes('bom dia') || message.includes('boa tarde')) {
+      return "Olá! Bem-vindo à Galeria Secreta! Sou a Sofia, sua assistente virtual. Estou aqui para esclarecer todas as suas dúvidas sobre nossa plataforma. Como posso ajudá-lo hoje?";
+    }
+    
+    // Resposta padrão
+    const defaultResponses = [
+      "Interessante pergunta! Pode ser mais específico sobre o que gostaria de saber sobre a Galeria Secreta?",
+      "Estou aqui para ajudar! Pode reformular sua pergunta ou usar uma das opções rápidas acima?",
+      "Desculpe, não entendi completamente. Pode me perguntar sobre candidatura, requisitos, ganhos ou nosso processo?",
+      "Fico feliz em esclarecer suas dúvidas! Pode ser mais específico sobre o que precisa saber?"
+    ];
+    
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+  }
+
+  // Mostrar notificação quando há nova mensagem e chat está fechado
+  function showNotificationBadge() {
+    const badge = document.querySelector('.notification-badge');
+    if (badge && !isAssistantOpen) {
+      badge.classList.remove('hidden');
+      badge.textContent = '1';
+    }
+  }
+
+  // Esconder notificação quando chat é aberto
+  function hideNotificationBadge() {
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+      badge.classList.add('hidden');
+    }
+  }
+
+  // Esconder badge quando assistant é aberto
+  if (assistantToggle) {
+    assistantToggle.addEventListener('click', hideNotificationBadge);
+  }
+
+  // Mostrar mensagem de boas-vindas após alguns segundos
+  setTimeout(() => {
+    if (!isAssistantOpen) {
+      showNotificationBadge();
+    }
+  }, 10000);
 }
 
 // Utilitários para formulários
