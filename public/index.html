@@ -1,83 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Galeria Secreta - Elegância e Sofisticação</title>
-    <meta name="description" content="Galeria Secreta - A mais exclusiva agência de acompanhantes em Moçambique. Elegância, sofisticação e discrição.">
-    <meta name="keywords" content="acompanhantes, elegância, sofisticação, Moçambique, Nampula, exclusivo">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="src/styles.css">
-    
-    <!-- Tailwind Config -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'playfair': ['Playfair Display', 'serif'],
-                        'inter': ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        'gold': {
-                            50: '#fffbeb',
-                            100: '#fef3c7',
-                            200: '#fde68a',
-                            300: '#fcd34d',
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                            700: '#b45309',
-                            800: '#92400e',
-                            900: '#78350f',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="bg-gray-900 text-white">
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay hidden">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Carregando...</p>
-    </div>
-
+    <meta name="description" content="Descubra um mundo exclusivo de elegância e sofisticação. Junte-se à nossa comunidade seleta de modelos profissionais.">
+    <meta name="keywords" content="galeria secreta, modelos, elegância, sofisticação, agência">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  </head>
+  <body>
     <!-- Navigation -->
     <nav id="navbar" class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <h1 class="brand-text">Galeria Secreta</h1>
-                <p class="brand-subtitle">Elegância & Sofisticação</p>
+            <div class="nav-logo">
+                <h2>Galeria Secreta</h2>
+                <div class="logo-accent"></div>
             </div>
             
-            <div class="nav-menu" id="nav-menu">
+            <div id="nav-menu" class="nav-menu">
                 <a href="#home" class="nav-link">Início</a>
+                <a href="#about" class="nav-link">Sobre</a>
                 <a href="#services" class="nav-link">Serviços</a>
                 <a href="#benefits" class="nav-link">Benefícios</a>
-                <a href="#values" class="nav-link">Valores</a>
                 <a href="#contact" class="nav-link">Contacto</a>
-                <button id="login-btn" class="btn-primary">Entrar</button>
+            </div>
+
+            <!-- Login and Support Options -->
+            <div class="nav-actions">
+                <button id="support-btn" class="nav-action-btn" aria-label="Abrir suporte">
+                    <span class="action-icon">❓</span>
+                    <span>Suporte</span>
+                </button>
+                
+
+
+
+
+
+<button id="login-btn" class="nav-action-btn nav-action-primary" aria-label="Fazer login">
+                    <span class="action-icon">👤</span>
+                    <span>Login</span>
+                </button>
+
+                <button id="signup-btn" class="nav-action-btn nav-action-primary" aria-label="Escreva-se">
+                    <span>Escreva-se</span>
+                </button>
+
             </div>
             
-            <div class="nav-toggle" id="nav-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div id="nav-toggle" class="nav-toggle" aria-label="Menu mobile">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </div>
         </div>
     </nav>
@@ -86,195 +63,261 @@
     <section id="home" class="hero">
         <div class="hero-background"></div>
         <div class="hero-overlay"></div>
+        <div class="hero-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        
         <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    Bem-vinda à <span class="text-gold-400">Galeria Secreta</span>
-                </h1>
-                <p class="hero-subtitle">
-                    A mais exclusiva agência de acompanhantes em Moçambique. 
-                    Onde elegância encontra sofisticação.
-                </p>
-                <div class="hero-buttons">
-                    <button id="join-btn" class="btn-primary">
-                        Quero Fazer Parte
-                        <div class="btn-shine"></div>
-                    </button>
-                    <button id="toggle-gallery-btn" class="btn-secondary">
-                        Ver Nossas Acompanhantes
-                        <div class="btn-shine"></div>
-                    </button>
-                </div>
+            <h1 class="hero-title">
+                <span class="title-line">Galeria</span>
+                <span class="title-line accent">Secreta</span>
+            </h1>
+            <p class="hero-subtitle">
+                Descubra um mundo exclusivo de elegância e sofisticação. 
+                Junte-se à nossa comunidade seleta de modelos profissionais.
+            </p>
+            <div class="hero-buttons">
+                <button id="join-btn" class="btn btn-primary">
+                    Quero Fazer Parte
+                    <div class="btn-shine"></div>
+                </button>
+                <a href="#about" class="btn btn-secondary">Saber Mais</a>
+                <button id="toggle-gallery-btn" class="btn btn-primary">
+                    Ver Nossas Acompanhantes
+                    <div class="btn-shine"></div>
+                </button>
             </div>
+        </div>
+        
+        
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section id="services" class="section">
+    <!-- About Section -->
+    <section id="about" class="about">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Nossos Serviços</h2>
-                <p class="section-subtitle">Experiências exclusivas e personalizadas</p>
+                <h2 class="section-title">Seja uma Acompanhante</h2>
+                <div class="section-divider"></div>
+                <p class="section-subtitle">Galeria Secreta – Mais que uma plataforma, uma irmandade.</p>
+            </div>
+
+            <div class="about-description">
+                <p>Há mais de 3 anos no mercado, a <strong>Galeria Secreta</strong> se tornou referência quando o assunto é <strong>acompanhantes de luxo</strong>. Não somos uma agência tradicional – somos uma <strong>família de mulheres independentes</strong>, comprometidas com o profissionalismo, o respeito e a liberdade de escolha.</p>
+            </div>
+
+            <div class="about-values">
+                <div class="value-item">
+                    <div class="value-icon">👑</div>
+                    <h3>Quem Somos</h3>
+                    <p>Mulheres que decidiram trilhar o caminho da autonomia sexual e financeira com responsabilidade, ética e elegância. Um espaço seguro, discreto e livre de estigmas, onde cada integrante pode crescer, aprender e brilhar.</p>
+                    <p><em>Somos contra a exploração sexual. Não somos cafetinas, nem bordel. Aqui, o poder está nas suas mãos.</em></p>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">📝</div>
+                    <h3>Requisitos</h3>
+                    <ul>
+                        <li>18 anos ou mais</li>
+                        <li>Residir em Moçambique</li>
+                        <li>Educada, discreta e disciplinada</li>
+                        <li>Extrovertida e aberta a novas experiências</li>
+                        <li>Higiene impecável</li>
+                        <li>Decisão consciente e voluntária</li>
+                    </ul>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">🚀</div>
+                    <h3>Etapas do Processo</h3>
+                    <ol>
+                        <li>Pré-entrevista (chat)</li>
+                        <li>Entrevista presencial</li>
+                        <li>Teste prático</li>
+                        <li>Sessão fotográfica</li>
+                        <li>Criação do perfil</li>
+                        <li>Aceitação na associação</li>
+                    </ol>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">🎁</div>
+                    <h3>O Que Oferecemos</h3>
+                    <ul>
+                        <li>Mentoria personalizada</li>
+                        <li>Acesso ao closet exclusivo</li>
+                        <li>Treinamentos e eventos</li>
+                        <li>Curso de inglês com certificado</li>
+                    </ul>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">💸</div>
+                    <h3>Ganhos</h3>
+                    <p>Você define seu valor. O pagamento é 100% seu.</p>
+                    <ul>
+                        <li><strong>Iniciante</strong>: 1.500–4.000 MT</li>
+                        <li><strong>Experiente</strong>: 4.000–7.000 MT</li>
+                        <li><strong>Profissional</strong>: acima de 8.000 MT</li>
+                    </ul>
+                    <p><em>Ajudamos você a encontrar o posicionamento ideal.</em></p>
+                </div>
+
+                <div class="value-item">
+                    <div class="value-icon">⚠️</div>
+                    <h3>Avisos Importantes</h3>
+                    <ul>
+                        <li>Não aceitamos menores de idade</li>
+                        <li>Não cobramos taxas</li>
+                        <li>Não somos agência ou bordel</li>
+                        <li>Contato apenas se estiver pronta para o processo seletivo</li>
+                    </ul>
+                </div>
             </div>
             
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-crown"></i>
-                    </div>
-                    <h3 class="service-title">Acompanhamento VIP</h3>
-                    <p class="service-description">
-                        Acompanhamento exclusivo para eventos sociais, jantares executivos e ocasiões especiais.
-                    </p>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-plane"></i>
-                    </div>
-                    <h3 class="service-title">Viagens Executivas</h3>
-                    <p class="service-description">
-                        Companhia sofisticada para viagens de negócios e eventos corporativos internacionais.
-                    </p>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-glass-cheers"></i>
-                    </div>
-                    <h3 class="service-title">Eventos Sociais</h3>
-                    <p class="service-description">
-                        Presença elegante em gala, premiações, lançamentos e eventos da alta sociedade.
-                    </p>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                    <h3 class="service-title">Campanhas & Modelagem</h3>
-                    <p class="service-description">
-                        Modelos profissionais para campanhas publicitárias, editoriais e eventos fashion.
-                    </p>
-                </div>
-            </div>
         </div>
     </section>
 
     <!-- Acompanhantes Section (Hidden by default) -->
-    <section id="acompanhantes" class="section hidden">
+    <section id="acompanhantes" class="acompanhantes hidden">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Nossas Acompanhantes</h2>
-                <p class="section-subtitle">Conheça nossa seleção exclusiva de modelos</p>
+                <div class="section-divider"></div>
+                <p class="section-subtitle">
+                    Conheça nossas modelos profissionais, elegantes e sofisticadas.
+                </p>
             </div>
             
             <div class="acompanhantes-grid">
                 <div class="acompanhante-card">
                     <div class="acompanhante-image">
-                        <img src="https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg" alt="Sofia">
+                        <img src="https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg" loading="lazy">
                         <div class="acompanhante-overlay">
-                            <button class="btn-view-profile" data-profile="sofia">Ver Perfil</button>
-                        </div>
-                    </div>
-                    <div class="acompanhante-info">
-                        <h3 class="acompanhante-name">Sofia</h3>
-                        <p class="acompanhante-category">Modelo Profissional</p>
-                        <div class="acompanhante-details">
-                            <span class="detail-item">25 anos</span>
-                            <span class="detail-item">Nampula</span>
+                            <div class="acompanhante-info">
+                                <h3>Sofia</h3>
+                                <p>Modelo Profissional</p>
+                                <div class="acompanhante-details">
+                                    <span>25 anos</span>
+                                    <span>Nampula</span>
+                                </div>
+                                <button class="btn-view-profile" data-profile="sofia">
+                                    Ver Perfil
+                                    <div class="btn-shine"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="acompanhante-card">
                     <div class="acompanhante-image">
-                        <img src="https://i.postimg.cc/25N7YD0r/123997228-3627243123965219-2863826447702482559-o.jpg" alt="Isabella">
+                        <img src="https://i.postimg.cc/25N7YD0r/123997228-3627243123965219-2863826447702482559-o.jpg" alt="Modelo profissional" loading="lazy">
                         <div class="acompanhante-overlay">
-                            <button class="btn-view-profile" data-profile="isabella">Ver Perfil</button>
-                        </div>
-                    </div>
-                    <div class="acompanhante-info">
-                        <h3 class="acompanhante-name">Isabella</h3>
-                        <p class="acompanhante-category">Modelo Experiente</p>
-                        <div class="acompanhante-details">
-                            <span class="detail-item">28 anos</span>
-                            <span class="detail-item">Nampula</span>
+                            <div class="acompanhante-info">
+                                <h3>Isabella</h3>
+                                <p>Modelo Experiente</p>
+                                <div class="acompanhante-details">
+                                    <span>28 anos</span>
+                                    <span>Nampula</span>
+                                </div>
+                                <button class="btn-view-profile" data-profile="isabella">
+                                    Ver Perfil
+                                    <div class="btn-shine"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="acompanhante-card">
                     <div class="acompanhante-image">
-                        <img src="https://i.postimg.cc/qRMnBMyV/143127941-421898882477563-1534463607340270020-o.jpg" alt="Valentina">
+                        <img src="https://i.postimg.cc/qRMnBMyV/143127941-421898882477563-1534463607340270020-o.jpg" alt="Modelo profissional" loading="lazy">
                         <div class="acompanhante-overlay">
-                            <button class="btn-view-profile" data-profile="valentina">Ver Perfil</button>
-                        </div>
-                    </div>
-                    <div class="acompanhante-info">
-                        <h3 class="acompanhante-name">Valentina</h3>
-                        <p class="acompanhante-category">Modelo Premium</p>
-                        <div class="acompanhante-details">
-                            <span class="detail-item">26 anos</span>
-                            <span class="detail-item">Nampula</span>
+                            <div class="acompanhante-info">
+                                <h3>Valentina</h3>
+                                <p>Modelo Premium</p>
+                                <div class="acompanhante-details">
+                                    <span>26 anos</span>
+                                    <span>Nampula</span>
+                                </div>
+                                <button class="btn-view-profile" data-profile="valentina">
+                                    Ver Perfil
+                                    <div class="btn-shine"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="acompanhante-card">
                     <div class="acompanhante-image">
-                        <img src="https://i.postimg.cc/Xv6mztFy/236376192-3857235194382171-763223918932869912-n.jpg" alt="Adriana">
+                        <img src="https://i.postimg.cc/Xv6mztFy/236376192-3857235194382171-763223918932869912-n.jpg" loading="lazy">
                         <div class="acompanhante-overlay">
-                            <button class="btn-view-profile" data-profile="adriana">Ver Perfil</button>
-                        </div>
-                    </div>
-                    <div class="acompanhante-info">
-                        <h3 class="acompanhante-name">Adriana</h3>
-                        <p class="acompanhante-category">Modelo Exclusiva</p>
-                        <div class="acompanhante-details">
-                            <span class="detail-item">24 anos</span>
-                            <span class="detail-item">Nampula</span>
+                            <div class="acompanhante-info">
+                                <h3>Adriana</h3>
+                                <p>Modelo Exclusiva</p>
+                                <div class="acompanhante-details">
+                                    <span>24 anos</span>
+                                    <span>Nampula</span>
+                                </div>
+                                <button class="btn-view-profile" data-profile="adriana">
+                                    Ver Perfil
+                                    <div class="btn-shine"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="acompanhante-card">
                     <div class="acompanhante-image">
-                        <img src="https://i.postimg.cc/66ZR9SGQ/236757367-4188721321213616-458560518676334121-n.jpg" alt="Camila">
+                        <img src="https://i.postimg.cc/66ZR9SGQ/236757367-4188721321213616-458560518676334121-n.jpg" loading="lazy">
                         <div class="acompanhante-overlay">
-                            <button class="btn-view-profile" data-profile="camila">Ver Perfil</button>
-                        </div>
-                    </div>
-                    <div class="acompanhante-info">
-                        <h3 class="acompanhante-name">Camila</h3>
-                        <p class="acompanhante-category">Modelo VIP</p>
-                        <div class="acompanhante-details">
-                            <span class="detail-item">27 anos</span>
-                            <span class="detail-item">Nampula</span>
+                            <div class="acompanhante-info">
+                                <h3>Camila</h3>
+                                <p>Modelo VIP</p>
+                                <div class="acompanhante-details">
+                                    <span>27 anos</span>
+                                    <span>Nampula</span>
+                                </div>
+                                <button class="btn-view-profile" data-profile="camila">
+                                    Ver Perfil
+                                    <div class="btn-shine"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="acompanhante-card">
                     <div class="acompanhante-image">
-                        <img src="https://i.postimg.cc/Xv2KCCV7/121973195-351310436287938-1918747329702667523-n.jpg" alt="Beatriz">
+                        <img src="https://i.postimg.cc/Xv2KCCV7/121973195-351310436287938-1918747329702667523-n.jpg" alt="Modelo profissional" loading="lazy">
                         <div class="acompanhante-overlay">
-                            <button class="btn-view-profile" data-profile="beatriz">Ver Perfil</button>
-                        </div>
-                    </div>
-                    <div class="acompanhante-info">
-                        <h3 class="acompanhante-name">Beatriz</h3>
-                        <p class="acompanhante-category">Modelo Elite</p>
-                        <div class="acompanhante-details">
-                            <span class="detail-item">29 anos</span>
-                            <span class="detail-item">Nampula</span>
+                            <div class="acompanhante-info">
+                                <h3>Beatriz</h3>
+                                <p>Modelo Elite</p>
+                                <div class="acompanhante-details">
+                                    <span>29 anos</span>
+                                    <span>Nampula</span>
+                                </div>
+                                <button class="btn-view-profile" data-profile="beatriz">
+                                    Ver Perfil
+                                    <div class="btn-shine"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="text-center mt-12">
-                <button id="contact-acompanhantes" class="btn-primary">
+            <div class="acompanhantes-cta">
+                <p>Interessado em conhecer mais sobre nossos serviços?</p>
+                <button id="contact-acompanhantes" class="btn btn-primary">
                     Entre em Contacto
                     <div class="btn-shine"></div>
                 </button>
@@ -282,278 +325,188 @@
         </div>
     </section>
 
-    <!-- Benefits Section -->
-    <section id="benefits" class="section bg-gray-800">
+    <!-- Services Section -->
+    <section id="services" class="services">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Por que Escolher a Galeria Secreta?</h2>
-                <p class="section-subtitle">Benefícios exclusivos para nossas modelos</p>
+                <h2 class="section-title">Nossos Serviços</h2>
+                <div class="section-divider"></div>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">📸</div>
+                    <h3>Modelagem Profissional</h3>
+                    <ul>
+                        <li>Sessões fotográficas exclusivas</li>
+                        <li>Campanhas publicitárias premium</li>
+                        <li>Eventos corporativos de alto nível</li>
+                        <li>Desfiles de moda exclusivos</li>
+                    </ul>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">🎯</div>
+                    <h3>Desenvolvimento Profissional</h3>
+                    <ul>
+                        <li>Coaching personalizado</li>
+                        <li>Workshops de etiqueta e postura</li>
+                        <li>Networking com profissionais da indústria</li>
+                        <li>Gestão de carreira especializada</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="benefits">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Benefícios Exclusivos</h2>
+                <div class="section-divider"></div>
             </div>
             
             <div class="benefits-grid">
                 <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3 class="benefit-title">Segurança Total</h3>
-                    <p class="benefit-description">
-                        Ambiente seguro e protegido com verificação rigorosa de clientes e acompanhamento profissional.
-                    </p>
+                    <div class="benefit-icon">❤️</div>
+                    <h3>Ambiente Acolhedor</h3>
+                    <p>Trabalhe num ambiente respeitoso e profissional, onde o seu bem-estar é prioridade.</p>
                 </div>
                 
                 <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <h3 class="benefit-title">Remuneração Premium</h3>
-                    <p class="benefit-description">
-                        Os melhores valores do mercado com pagamentos pontuais e transparentes.
-                    </p>
+                    <div class="benefit-icon">💰</div>
+                    <h3>Remuneração Competitiva</h3>
+                    <p>Oferecemos uma das melhores remunerações do mercado, com pagamentos pontuais.</p>
                 </div>
                 
                 <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3 class="benefit-title">Flexibilidade</h3>
-                    <p class="benefit-description">
-                        Horários flexíveis que respeitam sua disponibilidade e estilo de vida.
-                    </p>
-                </div>
-                
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <h3 class="benefit-title">Desenvolvimento</h3>
-                    <p class="benefit-description">
-                        Treinamentos em etiqueta, protocolo e desenvolvimento pessoal contínuo.
-                    </p>
-                </div>
-                
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-user-secret"></i>
-                    </div>
-                    <h3 class="benefit-title">Discrição</h3>
-                    <p class="benefit-description">
-                        Absoluta confidencialidade e proteção da sua privacidade e identidade.
-                    </p>
-                </div>
-                
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <h3 class="benefit-title">Clientela Exclusiva</h3>
-                    <p class="benefit-description">
-                        Acesso a uma clientela seleta de alto padrão social e econômico.
-                    </p>
+                    <div class="benefit-icon">📈</div>
+                    <h3>Crescimento Profissional</h3>
+                    <p>Oportunidades únicas de desenvolvimento e crescimento na sua carreira.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Values Section -->
-    <section id="values" class="section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Nossos Valores</h2>
-                <p class="section-subtitle">Os princípios que nos guiam</p>
-            </div>
-            
-            <div class="values-grid">
-                <div class="value-item">
-                    <div class="value-number">01</div>
-                    <h3 class="value-title">Elegância</h3>
-                    <p class="value-description">
-                        Refinamento e sofisticação em cada detalhe, desde a apresentação pessoal até o comportamento social.
-                    </p>
-                </div>
-                
-                <div class="value-item">
-                    <div class="value-number">02</div>
-                    <h3 class="value-title">Profissionalismo</h3>
-                    <p class="value-description">
-                        Compromisso com a excelência, pontualidade e dedicação em todos os serviços prestados.
-                    </p>
-                </div>
-                
-                <div class="value-item">
-                    <div class="value-number">03</div>
-                    <h3 class="value-title">Confidencialidade</h3>
-                    <p class="value-description">
-                        Proteção absoluta da privacidade de clientes e modelos, garantindo discrição total.
-                    </p>
-                </div>
-                
-                <div class="value-item">
-                    <div class="value-number">04</div>
-                    <h3 class="value-title">Exclusividade</h3>
-                    <p class="value-description">
-                        Seleção criteriosa que garante um padrão elevado de qualidade e diferenciação no mercado.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Application Section (Hidden by default) -->
-    <section id="application" class="section bg-gray-800 hidden">
+    <!-- Application Form -->
+    <section id="application" class="application hidden">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Candidatura</h2>
-                <p class="section-subtitle">Junte-se à nossa equipe exclusiva</p>
+                <div class="section-divider"></div>
+                <p class="section-subtitle">
+                    Preencha o formulário abaixo para se candidatar à nossa equipa exclusiva.
+                </p>
             </div>
             
-            <div class="application-form-container">
-                <form id="application-form" class="application-form" enctype="multipart/form-data">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nome" class="form-label">Nome Completo *</label>
-                            <input type="text" id="nome" name="nome" class="form-input" required>
-                            <div id="nome-error" class="error-message"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="idade" class="form-label">Idade *</label>
-                            <input type="number" id="idade" name="idade" class="form-input" min="18" max="65" required>
-                            <div id="idade-error" class="error-message"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pais" class="form-label">País</label>
-                            <select id="pais" name="pais" class="form-input">
-                                <option value="Moçambique">Moçambique</option>
-                                <option value="África do Sul">África do Sul</option>
-                                <option value="Zimbabwe">Zimbabwe</option>
-                                <option value="Tanzânia">Tanzânia</option>
-                                <option value="Outro">Outro</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="provincia" class="form-label">Província *</label>
-                            <select id="provincia" name="provincia" class="form-input" required>
-                                <option value="">Selecione uma província</option>
-                                <option value="Maputo">Maputo</option>
-                                <option value="Maputo Província">Maputo Província</option>
-                                <option value="Gaza">Gaza</option>
-                                <option value="Inhambane">Inhambane</option>
-                                <option value="Sofala">Sofala</option>
-                                <option value="Manica">Manica</option>
-                                <option value="Tete">Tete</option>
-                                <option value="Zambézia">Zambézia</option>
-                                <option value="Nampula">Nampula</option>
-                                <option value="Cabo Delgado">Cabo Delgado</option>
-                                <option value="Niassa">Niassa</option>
-                            </select>
-                            <div id="provincia-error" class="error-message"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email *</label>
-                            <input type="email" id="email" name="email" class="form-input" required>
-                            <div id="email-error" class="error-message"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="whatsapp" class="form-label">WhatsApp *</label>
-                            <input type="tel" id="whatsapp" name="whatsapp" class="form-input" placeholder="+258 XX XXX XXXX" required>
-                            <div id="whatsapp-error" class="error-message"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="foto" class="form-label">Foto Profissional *</label>
-                        <div class="file-upload">
-                            <input type="file" id="foto" name="foto" class="file-input" accept="image/*" required>
-                            <div class="file-upload-text">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span>Clique para selecionar uma foto</span>
-                                <small>JPG, PNG ou WEBP (máx. 5MB)</small>
-                            </div>
-                            <img id="photo-preview" class="photo-preview" style="display: none;">
-                        </div>
-                        <div id="foto-error" class="error-message"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="termos" name="termos" required>
-                            <span class="checkmark"></span>
-                            Aceito os <a href="#" class="privacy-link">termos e condições</a> e política de privacidade
-                        </label>
-                        <div id="termos-error" class="error-message"></div>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary btn-submit">
-                        <span class="btn-text">Enviar Candidatura</span>
-                        <div class="btn-loader" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                        <div class="btn-shine"></div>
-                    </button>
-                </form>
+            <div class="form-container">
+                
+<form id="application-form" class="application-form" novalidate>
+<div class="form-group">
+        <label for="nome">Nome Completo *</label>
+        <input type="text" id="nome" name="nome" required>
+    </div>
+
+    <div class="form-group">
+        <label for="idade">Idade *</label>
+        <input type="number" id="idade" name="idade" min="18" max="65" required>
+    </div>
+
+    <div class="form-group">
+        <label for="pais">País *</label>
+        <input type="text" id="pais" name="pais" value="Moçambique" readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="provincia">Selecione a Província *</label>
+        <select id="provincia" name="provincia" required>
+            <option value="">Selecione...</option>
+            <option value="cabo-delgado">Cabo Delgado</option>
+            <option value="gaza">Gaza</option>
+            <option value="inhambane">Inhambane</option>
+            <option value="manica">Manica</option>
+            <option value="maputo">Maputo</option>
+            <option value="maputo-cidade">Maputo (Cidade)</option>
+            <option value="nampula">Nampula</option>
+            <option value="niassa">Niassa</option>
+            <option value="sofala">Sofala</option>
+            <option value="tete">Tete</option>
+            <option value="zambezia">Zambézia</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="email">E-mail *</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+        <label for="whatsapp">WhatsApp *</label>
+        <input type="tel" id="whatsapp" name="whatsapp" required>
+    </div>
+
+    
+    <div class="form-group">
+        <label for="foto">Foto Profissional *</label>
+        <div class="file-upload" tabindex="0" role="button" aria-label="Carregar foto profissional">
+            <input type="file" id="foto" name="foto" accept="image/*" required>
+            <div class="file-upload-text">
+                <div class="upload-icon">📷</div>
+                <p><strong>Carregue a sua foto nítida</strong></p>
+                <p>PNG, JPG até 10MB</p>
+            </div>
+            <img id="photo-preview" class="photo-preview" style="display: none;" alt="Pré-visualização da foto">
+        </div>
+    </div>
+
+    <div class="checkbox-group">
+        <div class="custom-checkbox">
+            <input type="checkbox" id="termos" name="termos" required>
+            <label for="termos" class="checkbox-label">
+                <div class="checkmark"></div>
+            </label>
+        </div>
+        <label for="termos" class="checkbox-text">
+            Concordo com os termos e condições e autorizo o tratamento dos meus dados pessoais 
+            para fins de recrutamento, conforme a política de privacidade da Galeria Secreta.
+        </label>
+    </div>
+
+<button type="submit" class="btn btn-primary btn-submit">
+        <span class="btn-text">Enviar Candidatura</span>
+        <div class="btn-loader" style="display: none;" aria-hidden="true"></div>
+        <div class="btn-shine"></div>
+    </button>
+</form>
+
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="section bg-gray-800">
+    <section id="contact" class="contact">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Entre em Contacto</h2>
-                <p class="section-subtitle">Estamos aqui para esclarecer suas dúvidas</p>
+                <h2 class="section-title">Contacto</h2>
+                <div class="section-divider"></div>
             </div>
             
-            <div class="contact-grid">
+            <div class="contact-info">
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fab fa-whatsapp"></i>
+                    <div class="contact-icon">📞</div>
+                    <div class="contact-details">
+                        <h3>Telefone</h3>
+                        <a href="tel:+258853131185">+258 853131185</a>
                     </div>
-                    <h3 class="contact-title">WhatsApp</h3>
-                    <p class="contact-description">Atendimento rápido e direto</p>
-                    <a href="https://wa.me/258851551556" class="contact-link" target="_blank">
-                        +258 851551556
-                    </a>
                 </div>
                 
                 <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone"></i>
+                    <div class="contact-icon">✉️</div>
+                    <div class="contact-details">
+                        <h3>Email</h3>
+                        <a href="mailto:galeriasecreta@gmail.com">galeriasecretamocambique@gmail.com</a>
                     </div>
-                    <h3 class="contact-title">Telefone</h3>
-                    <p class="contact-description">Ligue para nós</p>
-                    <a href="tel:+258851551556" class="contact-link">
-                        +258 851551556
-                    </a>
-                </div>
-                
-                <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h3 class="contact-title">Email</h3>
-                    <p class="contact-description">Envie-nos uma mensagem</p>
-                    <a href="mailto:galeriasecretamz@gmail.com" class="contact-link">
-                        galeriasecretamz@gmail.com
-                    </a>
-                </div>
-                
-                <div class="contact-item">
-                    <div class="contact-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3 class="contact-title">Suporte</h3>
-                    <p class="contact-description">Ajuda especializada</p>
-                    <button id="support-btn" class="contact-link">
-                        Abrir Suporte
-                    </button>
                 </div>
             </div>
         </div>
@@ -563,572 +516,368 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <h3 class="footer-title">Galeria Secreta</h3>
-                    <p class="footer-description">
-                        A mais exclusiva agência de acompanhantes em Moçambique. 
-                        Elegância, sofisticação e discrição.
-                    </p>
+                <div class="footer-logo">
+                    <h3>Galeria Secreta</h3>
+                    <p>Elegância e Sofisticação</p>
                 </div>
-                
-                <div class="footer-section">
-                    <h4 class="footer-subtitle">Contacto</h4>
-                    <div class="footer-links">
-                        <a href="tel:+258851551556" class="footer-link">
-                            <i class="fas fa-phone"></i> +258 851551556
-                        </a>
-                        <a href="mailto:galeriasecretamz@gmail.com" class="footer-link">
-                            <i class="fas fa-envelope"></i> galeriasecretamz@gmail.com
-                        </a>
-                        <a href="https://wa.me/258851551556" class="footer-link" target="_blank">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4 class="footer-subtitle">Serviços</h4>
-                    <div class="footer-links">
-                        <a href="#services" class="footer-link">Acompanhamento VIP</a>
-                        <a href="#services" class="footer-link">Viagens Executivas</a>
-                        <a href="#services" class="footer-link">Eventos Sociais</a>
-                        <a href="#services" class="footer-link">Campanhas & Modelagem</a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4 class="footer-subtitle">Informações</h4>
-                    <div class="footer-links">
-                        <button id="signup-btn" class="footer-link">Inscrever-se</button>
-                        <a href="#" class="footer-link privacy-link">Política de Privacidade</a>
-                        <a href="#benefits" class="footer-link">Benefícios</a>
-                        <a href="#values" class="footer-link">Nossos Valores</a>
-                    </div>
+                <div class="footer-links">
+                    <a href="#home">Início</a>
+                    <a href="#about">Sobre</a>
+                    <a href="#contact">Contacto</a>
+                    <a href="#privacy" class="privacy-link">Política de Privacidade</a>
                 </div>
             </div>
-            
             <div class="footer-bottom">
-                <p>&copy; 2024 Galeria Secreta. Todos os direitos reservados.</p>
-                <p class="footer-disclaimer">
-                    Serviços destinados exclusivamente a maiores de 18 anos. 
-                    Discrição e confidencialidade garantidas.
-                </p>
+                <p>© 2024 Galeria Secreta. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Modals -->
     
     <!-- Login Modal -->
-    <div id="login-modal" class="modal hidden">
+    <div id="login-modal" class="modal hidden" role="dialog" aria-labelledby="login-title" aria-modal="true">
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Entrar</h2>
-                <button id="login-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3 id="login-title">Login</h3>
+                <button class="modal-close" id="login-close" aria-label="Fechar modal">&times;</button>
             </div>
-            
-            <form id="login-form" class="modal-form">
+            <form class="modal-form" id="login-form" novalidate>
                 <div class="form-group">
-                    <label for="login-email" class="form-label">Email</label>
-                    <input type="email" id="login-email" name="email" class="form-input" required>
-                    <div id="email-error" class="error-message"></div>
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" name="email" required autocomplete="email" aria-describedby="login-email-error">
+                    <div id="login-email-error" class="error-message" role="alert"></div>
                 </div>
-                
                 <div class="form-group">
-                    <label for="login-password" class="form-label">Palavra-passe</label>
-                    <input type="password" id="login-password" name="password" class="form-input" required>
-                    <div id="password-error" class="error-message"></div>
+                    <label for="login-password">Palavra-passe</label>
+                    <input type="password" id="login-password" name="password" required autocomplete="current-password" aria-describedby="login-password-error">
+                    <div id="login-password-error" class="error-message" role="alert"></div>
                 </div>
-                
-                <div class="form-group">
-                    <a href="#" class="forgot-password">Esqueceu a palavra-passe?</a>
-                </div>
-                
-                <button type="submit" class="btn-primary btn-submit">
+                <button type="submit" class="btn btn-primary">
                     <span class="btn-text">Entrar</span>
-                    <div class="btn-loader" style="display: none;">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </div>
+                    <div class="btn-loader" style="display: none;" aria-hidden="true"></div>
+                    <div class="btn-shine"></div>
                 </button>
             </form>
+            <div class="modal-footer">
+                <a href="#" class="forgot-password">Esqueceu a palavra-passe?</a>
+            </div>
         </div>
     </div>
 
     <!-- Signup Modal -->
-    <div id="signup-modal" class="modal hidden">
+    <div id="signup-modal" class="modal hidden" role="dialog" aria-labelledby="signup-title" aria-modal="true">
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Inscrever-se</h2>
-                <button id="signup-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3 id="signup-title">Inscrever-se na Galeria Secreta</h3>
+                <button class="modal-close" id="signup-close" aria-label="Fechar modal">&times;</button>
             </div>
             
-            <form id="signup-form" class="modal-form">
+            <form class="modal-form" id="signup-form" novalidate>
                 <div class="form-group">
-                    <label for="signup-nome" class="form-label">Nome Completo</label>
-                    <input type="text" id="signup-nome" name="nome" class="form-input" required>
-                    <div id="nome-error" class="error-message"></div>
+                    <label for="signup-nome">Nome Completo *</label>
+                    <input type="text" id="signup-nome" name="nome" required autocomplete="name" aria-describedby="signup-nome-error">
+                    <div id="signup-nome-error" class="error-message" role="alert"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="signup-email" class="form-label">Email</label>
-                    <input type="email" id="signup-email" name="email" class="form-input" required>
-                    <div id="email-error" class="error-message"></div>
+                    <label for="signup-email">Email *</label>
+                    <input type="email" id="signup-email" name="email" required autocomplete="email" aria-describedby="signup-email-error">
+                    <div id="signup-email-error" class="error-message" role="alert"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="signup-password" class="form-label">Palavra-passe</label>
-                    <input type="password" id="signup-password" name="password" class="form-input" required>
-                    <div id="password-error" class="error-message"></div>
+                    <label for="signup-telefone">Telefone/WhatsApp *</label>
+                    <input type="tel" id="signup-telefone" name="telefone" required autocomplete="tel" aria-describedby="signup-telefone-error">
+                    <div id="signup-telefone-error" class="error-message" role="alert"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="signup-confirm-password" class="form-label">Confirmar Palavra-passe</label>
-                    <input type="password" id="signup-confirm-password" name="confirmPassword" class="form-input" required>
-                    <div id="confirm-password-error" class="error-message"></div>
+                    <label for="signup-data-nascimento">Data de Nascimento *</label>
+                    <input type="date" id="signup-data-nascimento" name="data_nascimento" required aria-describedby="signup-data-nascimento-error">
+                    <div id="signup-data-nascimento-error" class="error-message" role="alert"></div>
                 </div>
                 
                 <div class="form-group">
-                    <p class="text-sm text-gray-400">
-                        Já tem uma conta? 
-                        <a href="#" id="switch-to-login" class="text-gold-400 hover:text-gold-300">Entre aqui</a>
-                    </p>
+                    <label for="signup-genero">Gênero *</label>
+                    <select id="signup-genero" name="genero" required aria-describedby="signup-genero-error">
+                        <option value="">Selecione...</option>
+                        <option value="feminino">Feminino</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                    <div id="signup-genero-error" class="error-message" role="alert"></div>
                 </div>
                 
-                <button type="submit" class="btn-primary btn-submit">
-                    <span class="btn-text">Inscrever-se</span>
-                    <div class="btn-loader" style="display: none;">
-                        <i class="fas fa-spinner fa-spin"></i>
+                <div class="form-group">
+                    <label for="signup-cidade">Cidade *</label>
+                    <input type="text" id="signup-cidade" name="cidade" required aria-describedby="signup-cidade-error">
+                    <div id="signup-cidade-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-provincia">Província *</label>
+                    <select id="signup-provincia" name="provincia" required aria-describedby="signup-provincia-error">
+                        <option value="">Selecione...</option>
+                        <option value="cabo-delgado">Cabo Delgado</option>
+                        <option value="gaza">Gaza</option>
+                        <option value="inhambane">Inhambane</option>
+                        <option value="manica">Manica</option>
+                        <option value="maputo">Maputo</option>
+                        <option value="maputo-cidade">Maputo (Cidade)</option>
+                        <option value="nampula">Nampula</option>
+                        <option value="niassa">Niassa</option>
+                        <option value="sofala">Sofala</option>
+                        <option value="tete">Tete</option>
+                        <option value="zambezia">Zambézia</option>
+                    </select>
+                    <div id="signup-provincia-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-profissao">Profissão Atual</label>
+                    <input type="text" id="signup-profissao" name="profissao" aria-describedby="signup-profissao-error">
+                    <div id="signup-profissao-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-disponibilidade">Disponibilidade *</label>
+                    <select id="signup-disponibilidade" name="disponibilidade" required aria-describedby="signup-disponibilidade-error">
+                        <option value="">Selecione...</option>
+                        <option value="tempo_integral">Tempo Integral</option>
+                        <option value="meio_periodo">Meio Período</option>
+                        <option value="fins_semana">Fins de Semana</option>
+                        <option value="flexivel">Flexível</option>
+                    </select>
+                    <div id="signup-disponibilidade-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-motivacao">Motivação para se juntar à Galeria Secreta</label>
+                    <textarea id="signup-motivacao" name="motivacao" rows="3" placeholder="Conte-nos por que deseja fazer parte da nossa comunidade..." aria-describedby="signup-motivacao-error"></textarea>
+                    <div id="signup-motivacao-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="signup-experiencia" name="experiencia_anterior">
+                        <label for="signup-experiencia" class="checkbox-label">
+                            <div class="checkmark"></div>
+                        </label>
                     </div>
+                    <label for="signup-experiencia" class="checkbox-text">
+                        Tenho experiência anterior como acompanhante ou modelo
+                    </label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="signup-newsletter" name="newsletter">
+                        <label for="signup-newsletter" class="checkbox-label">
+                            <div class="checkmark"></div>
+                        </label>
+                    </div>
+                    <label for="signup-newsletter" class="checkbox-text">
+                        Desejo receber newsletters e atualizações por email
+                    </label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="signup-termos" name="termos_aceitos" required>
+                        <label for="signup-termos" class="checkbox-label">
+                            <div class="checkmark"></div>
+                        </label>
+                    </div>
+                    <label for="signup-termos" class="checkbox-text">
+                        Concordo com os termos e condições e autorizo o tratamento dos meus dados pessoais *
+                    </label>
+                    <div id="signup-termos-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-text">Enviar Inscrição</span>
+                    <div class="btn-loader" style="display: none;" aria-hidden="true"></div>
+                    <div class="btn-shine"></div>
                 </button>
             </form>
-        </div>
-    </div>
-
-    <!-- Forgot Password Modal -->
-    <div id="forgot-password-modal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Recuperar Palavra-passe</h2>
-                <button id="forgot-password-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <p class="text-gray-400 mb-6">
-                    Digite seu email para receber um código de verificação de 6 dígitos.
-                </p>
-                
-                <form id="forgot-password-form" class="modal-form">
-                    <div class="form-group">
-                        <label for="forgot-email" class="form-label">Email</label>
-                        <input type="email" id="forgot-email" name="email" class="form-input" required>
-                        <div id="email-error" class="error-message"></div>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary btn-submit">
-                        <span class="btn-text">Enviar Código</span>
-                        <div class="btn-loader" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </button>
-                    
-                    <div class="text-center mt-4">
-                        <a href="#" id="back-to-login" class="text-gold-400 hover:text-gold-300">
-                            Voltar ao login
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Verify Code Modal -->
-    <div id="verify-code-modal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Verificar Código</h2>
-                <button id="verify-code-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <p class="text-gray-400 mb-4">
-                    Enviamos um código de 6 dígitos para:
-                </p>
-                <p class="text-gold-400 font-semibold mb-4" id="verify-code-email">
-                    email@exemplo.com
-                </p>
-                <p class="text-sm text-gray-500 mb-6">
-                    Código válido por: <span id="code-countdown" class="text-gold-400 font-mono">15:00</span>
-                </p>
-                
-                <form id="verify-code-form" class="modal-form">
-                    <div class="form-group">
-                        <label for="reset-code" class="form-label">Código de Verificação</label>
-                        <input 
-                            type="text" 
-                            id="reset-code" 
-                            name="codigo" 
-                            class="form-input text-center text-2xl font-mono tracking-widest" 
-                            placeholder="000000"
-                            maxlength="6"
-                            required
-                        >
-                        <div id="codigo-error" class="error-message"></div>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary btn-submit">
-                        <span class="btn-text">Verificar Código</span>
-                        <div class="btn-loader" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </button>
-                    
-                    <div class="text-center mt-4 space-y-2">
-                        <a href="#" id="resend-code" class="text-gold-400 hover:text-gold-300">
-                            Reenviar código
-                        </a>
-                        <br>
-                        <a href="#" id="back-to-forgot" class="text-gray-400 hover:text-gray-300">
-                            Voltar
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reset Password Modal -->
-    <div id="reset-password-modal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Nova Palavra-passe</h2>
-                <button id="reset-password-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <p class="text-gray-400 mb-4">
-                    Defina uma nova palavra-passe para:
-                </p>
-                <p class="text-gold-400 font-semibold mb-6" id="reset-user-email">
-                    email@exemplo.com
-                </p>
-                
-                <form id="reset-password-form" class="modal-form">
-                    <div class="form-group">
-                        <label for="nova-senha" class="form-label">Nova Palavra-passe</label>
-                        <input type="password" id="nova-senha" name="novaSenha" class="form-input" required>
-                        <div id="nova-senha-error" class="error-message"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="confirmar-senha" class="form-label">Confirmar Palavra-passe</label>
-                        <input type="password" id="confirmar-senha" name="confirmarSenha" class="form-input" required>
-                        <div id="confirmar-senha-error" class="error-message"></div>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary btn-submit">
-                        <span class="btn-text">Redefinir Palavra-passe</span>
-                        <div class="btn-loader" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Support Modal -->
-    <div id="support-modal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Suporte</h2>
-                <button id="support-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="support-options">
-                    <div class="support-option">
-                        <div class="support-icon">
-                            <i class="fab fa-whatsapp"></i>
-                        </div>
-                        <div class="support-content">
-                            <h3 class="support-title">WhatsApp</h3>
-                            <p class="support-description">Atendimento rápido e direto</p>
-                            <a href="https://wa.me/258851551556" class="btn-primary" target="_blank">
-                                Abrir WhatsApp
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="support-option">
-                        <div class="support-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="support-content">
-                            <h3 class="support-title">Telefone</h3>
-                            <p class="support-description">Ligue para nós</p>
-                            <a href="tel:+258851551556" class="btn-primary">
-                                Ligar Agora
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="support-option">
-                        <div class="support-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="support-content">
-                            <h3 class="support-title">Email</h3>
-                            <p class="support-description">Envie-nos uma mensagem</p>
-                            <a href="mailto:galeriasecretamz@gmail.com" class="btn-primary">
-                                Enviar Email
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="support-hours">
-                    <h4 class="text-gold-400 font-semibold mb-2">Horário de Atendimento</h4>
-                    <p class="text-gray-400">Segunda a Domingo: 24 horas</p>
-                    <p class="text-sm text-gray-500 mt-2">
-                        Resposta garantida em até 30 minutos
-                    </p>
-                </div>
+            <div class="modal-footer">
+                <p>Já tem uma conta? <a href="#" id="switch-to-login" class="switch-link">Faça login</a></p>
             </div>
         </div>
     </div>
 
     <!-- Profile Modal -->
-    <div id="profile-modal" class="modal hidden">
+    <div id="profile-modal" class="modal hidden" role="dialog" aria-labelledby="profile-title" aria-modal="true">
         <div class="modal-overlay"></div>
-        <div class="modal-content modal-large">
+        <div class="modal-content profile-modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="profile-name">Nome da Acompanhante</h2>
-                <button id="profile-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3 id="profile-title">Perfil da Acompanhante</h3>
+                <button class="modal-close" id="profile-close" aria-label="Fechar modal">&times;</button>
             </div>
             
-            <div class="modal-body">
-                <div class="profile-content">
-                    <div class="profile-main">
-                        <div class="profile-image-container">
-                            <img id="profile-main-img" src="" alt="Foto principal" class="profile-main-image">
+            <div class="profile-content">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-main-image">
+                        <img id="profile-main-img" src="" alt="Foto principal">
+                    </div>
+                    <div class="profile-basic-info">
+                        <h2 id="profile-name">Nome</h2>
+                        <p id="profile-category">Categoria</p>
+                        <div class="profile-stats">
+                            <span id="profile-age">Idade</span>
+                            <span id="profile-location">Localização</span>
                         </div>
-                        
-                        <div class="profile-info">
-                            <div class="profile-header">
-                                <span class="profile-category" id="profile-category">Categoria</span>
-                                <div class="profile-details">
-                                    <span class="profile-age" id="profile-age">Idade</span>
-                                    <span class="profile-location" id="profile-location">Localização</span>
-                                </div>
+                        <div class="profile-rating">
+                            <div class="stars">
+                                <span>⭐⭐⭐⭐⭐</span>
                             </div>
-                            
-                            <div class="profile-bio">
-                                <h3 class="profile-section-title">Sobre</h3>
-                                <p id="profile-bio" class="profile-text">Biografia da acompanhante...</p>
-                            </div>
-                            
-                            <div class="profile-availability">
-                                <h3 class="profile-section-title">Disponibilidade</h3>
-                                <p id="profile-availability" class="profile-text">Horários disponíveis...</p>
-                            </div>
+                            <span class="rating-text">Avaliação Premium</span>
                         </div>
                     </div>
-                    
-                    <div class="profile-gallery-section">
-                        <h3 class="profile-section-title">Galeria</h3>
-                        <div id="profile-gallery" class="profile-gallery">
-                            <!-- Imagens da galeria serão inseridas aqui -->
-                        </div>
+                </div>
+
+                <!-- Profile Gallery -->
+                <div class="profile-gallery">
+                    <h4>Galeria de Fotos</h4>
+                    <div class="gallery-grid" id="profile-gallery">
+                        <!-- Images will be populated by JavaScript -->
                     </div>
-                    
-                    <div class="profile-services-section">
-                        <h3 class="profile-section-title">Serviços</h3>
-                        <div id="profile-services" class="profile-services">
-                            <!-- Serviços serão inseridos aqui -->
-                        </div>
+                </div>
+
+                <!-- Profile Biography -->
+                <div class="profile-section">
+                    <h4>Sobre Mim</h4>
+                    <p id="profile-bio">Biografia da acompanhante...</p>
+                </div>
+
+                <!-- Profile Services -->
+                <div class="profile-section">
+                    <h4>Serviços Oferecidos</h4>
+                    <div class="services-list" id="profile-services">
+                        <!-- Services will be populated by JavaScript -->
                     </div>
-                    
-                    <div class="profile-specialties-section">
-                        <h3 class="profile-section-title">Especialidades</h3>
-                        <div id="profile-specialties" class="profile-specialties">
-                            <!-- Especialidades serão inseridas aqui -->
-                        </div>
+                </div>
+
+                <!-- Profile Specialties -->
+                <div class="profile-section">
+                    <h4>Especialidades</h4>
+                    <div class="specialties-tags" id="profile-specialties">
+                        <!-- Specialties will be populated by JavaScript -->
                     </div>
-                    
-                    <div class="profile-actions">
-                        <a id="profile-whatsapp" href="#" class="btn-primary" target="_blank">
-                            <i class="fab fa-whatsapp"></i>
-                            WhatsApp
+                </div>
+
+                <!-- Profile Contact -->
+                <div class="profile-contact">
+                    <h4>Entre em Contacto</h4>
+                    <div class="contact-buttons">
+                        <a id="profile-whatsapp" href="https://wa.me/258865595417?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta" class="btn btn-whatsapp" target="_blank">
+                            <span class="whatsapp-icon">📱</span>
+                            Contactar via WhatsApp
+                            <div class="btn-shine"></div>
                         </a>
-                        <button id="profile-call" class="btn-secondary">
-                            <i class="fas fa-phone"></i>
-                            Ligar
+                        <button class="btn btn-secondary" id="profile-call">
+                            <span>📞</span>
+                            Solicitar Chamada
                         </button>
                     </div>
+                    <div class="contact-info">
+                        <p class="availability">Disponível: <span id="profile-availability">24/7</span></p>
+                        <p class="response-time">Tempo de resposta: <span>Imediato</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div id="support-modal" class="modal hidden" role="dialog" aria-labelledby="support-title" aria-modal="true">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="support-title">Suporte</h3>
+                <button class="modal-close" id="support-close" aria-label="Fechar modal">&times;</button>
+            </div>
+            <div class="support-content">
+                <div class="support-intro">
+                    <div class="support-icon">❓</div>
+                    <p>Como podemos ajudá-lo? Entre em contacto connosco através dos canais abaixo.</p>
+                </div>
+                
+                <div class="support-options">
+                    <a href="tel:+258853131185" class="support-option">
+                        <div class="support-option-icon">📞</div>
+                        <div class="support-option-details">
+                            <h4>Telefone</h4>
+                            <p>+258 853131185</p>
+                        </div>
+                    </a>
+                    
+                    <a href="mailto:galeriasecreta@gmail.com" class="support-option">
+                        <div class="support-option-icon">✉️</div>
+                        <div class="support-option-details">
+                            <h4>Email</h4>
+                            <p>galeriasecretamocambique@gmail.com</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="support-hours">
+                    <p>Horário de atendimento: Segunda a Sexta, 9h às 18h</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Success Modal -->
-    <div id="success-modal" class="modal hidden">
+    <div id="success-modal" class="modal hidden" role="dialog" aria-labelledby="success-title" aria-modal="true">
         <div class="modal-overlay"></div>
-        <div class="modal-content">
+        <div class="modal-content success-content">
             <div class="modal-header">
-                <h2 class="modal-title">Candidatura Enviada!</h2>
-                <button id="success-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3 id="success-title">✨ Candidatura Enviada!</h3>
+                <button class="modal-close" id="success-close" aria-label="Fechar modal">&times;</button>
             </div>
-            
-            <div class="modal-body text-center">
-                <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                
-                <h3 class="success-title">Obrigado pelo seu interesse!</h3>
-                
-                <p class="success-message">
-                    Sua candidatura foi enviada com sucesso. Nossa equipe irá analisar 
-                    suas informações e entrar em contacto em breve.
-                </p>
-                
-                <div class="success-next-steps">
-                    <h4 class="text-gold-400 font-semibold mb-3">Próximos Passos:</h4>
-                    <ul class="text-left space-y-2 text-gray-400">
-                        <li>✓ Análise da candidatura (24-48h)</li>
-                        <li>✓ Contacto via WhatsApp ou telefone</li>
-                        <li>✓ Entrevista inicial (se aprovada)</li>
-                        <li>✓ Integração na equipe</li>
-                    </ul>
-                </div>
-                
-                <div class="success-contact">
-                    <p class="text-sm text-gray-500 mb-4">
-                        Dúvidas? Entre em contacto connosco:
-                    </p>
-                    <div class="flex justify-center space-x-4">
-                        <a href="https://wa.me/258851551556" class="text-gold-400 hover:text-gold-300" target="_blank">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
-                        </a>
-                        <a href="tel:+258851551556" class="text-gold-400 hover:text-gold-300">
-                            <i class="fas fa-phone"></i> Telefone
-                        </a>
-                    </div>
-                </div>
-                
-                <button id="success-ok" class="btn-primary mt-6">
-                    Entendido
+            <div class="success-body">
+                <div class="success-icon">🎉</div>
+                <p>A sua candidatura foi enviada com sucesso! Entraremos em contacto em breve.</p>
+                <button class="btn btn-primary" id="success-ok">
+                    Perfeito!
+                    <div class="btn-shine"></div>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Privacy Modal -->
-    <div id="privacy-modal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h2 class="modal-title">Política de Privacidade</h2>
-                <button id="privacy-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="privacy-content">
-                    <section class="privacy-section">
-                        <h3 class="privacy-subtitle">1. Informações que Coletamos</h3>
-                        <p class="privacy-text">
-                            Coletamos informações pessoais fornecidas voluntariamente, incluindo nome, 
-                            idade, contacto, localização e fotografias para fins de candidatura.
-                        </p>
-                    </section>
-                    
-                    <section class="privacy-section">
-                        <h3 class="privacy-subtitle">2. Como Usamos as Informações</h3>
-                        <p class="privacy-text">
-                            As informações são utilizadas exclusivamente para:
-                        </p>
-                        <ul class="privacy-list">
-                            <li>Avaliação de candidaturas</li>
-                            <li>Comunicação com candidatas</li>
-                            <li>Prestação de serviços</li>
-                            <li>Cumprimento de obrigações legais</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="privacy-section">
-                        <h3 class="privacy-subtitle">3. Proteção de Dados</h3>
-                        <p class="privacy-text">
-                            Implementamos medidas de segurança rigorosas para proteger suas informações 
-                            pessoais contra acesso não autorizado, alteração, divulgação ou destruição.
-                        </p>
-                    </section>
-                    
-                    <section class="privacy-section">
-                        <h3 class="privacy-subtitle">4. Confidencialidade</h3>
-                        <p class="privacy-text">
-                            Garantimos absoluta confidencialidade de todas as informações pessoais. 
-                            Não compartilhamos dados com terceiros sem consentimento expresso.
-                        </p>
-                    </section>
-                    
-                    <section class="privacy-section">
-                        <h3 class="privacy-subtitle">5. Seus Direitos</h3>
-                        <p class="privacy-text">
-                            Você tem o direito de:
-                        </p>
-                        <ul class="privacy-list">
-                            <li>Acessar suas informações pessoais</li>
-                            <li>Corrigir dados incorretos</li>
-                            <li>Solicitar exclusão de dados</li>
-                            <li>Retirar consentimento a qualquer momento</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="privacy-section">
-                        <h3 class="privacy-subtitle">6. Contacto</h3>
-                        <p class="privacy-text">
-                            Para questões sobre privacidade, entre em contacto:
-                        </p>
-                        <div class="privacy-contact">
-                            <p>Email: galeriasecretamz@gmail.com</p>
-                            <p>WhatsApp: +258 851551556</p>
-                        </div>
-                    </section>
-                    
-                    <div class="privacy-footer">
-                        <p class="text-sm text-gray-500">
-                            Última atualização: Janeiro 2024
-                        </p>
-                    </div>
-                </div>
-            </div>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="src/script.js"></script>
+    <link rel="stylesheet" href="src/styles.css">
+    <script src="src/script.js">
+document.getElementById('signup-btn')?.addEventListener('click', () => {
+  document.querySelector('#application')?.scrollIntoView({ behavior: 'smooth' });
+});
+
+</script>
+  
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const signupBtn = document.getElementById('signup-btn');
+    const signupModal = document.getElementById('signup-modal');
+    if (signupBtn && signupModal) {
+      signupBtn.addEventListener('click', function () {
+        signupModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
