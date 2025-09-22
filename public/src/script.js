@@ -1278,3 +1278,35 @@ window.addEventListener('error', (e) => {
 window.addEventListener('unhandledrejection', (e) => {
   console.error('Promise rejeitada:', e.reason);
 });
+
+// Aviso de cookies (GDPR compliance)
+function showCookieNotice() {
+  if (localStorage.getItem('cookiesAccepted')) {
+    return;
+  }
+  
+  const cookieNotice = document.createElement('div');
+  cookieNotice.className = 'cookie-notice';
+  cookieNotice.innerHTML = `
+    <div class="cookie-content">
+      <p>Este site utiliza cookies para melhorar sua experiência. Ao continuar navegando, você concorda com nossa política de cookies.</p>
+      <div class="cookie-buttons">
+        <button class="btn btn-primary btn-accept-cookies">Aceitar</button>
+        <button class="btn btn-secondary btn-decline-cookies">Recusar</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(cookieNotice);
+  
+  // Event listeners
+  cookieNotice.querySelector('.btn-accept-cookies').addEventListener('click', () => {
+    localStorage.setItem('cookiesAccepted', 'true');
+    cookieNotice.remove();
+  });
+  
+  cookieNotice.querySelector('.btn-decline-cookies').addEventListener('click', () => {
+    localStorage.setItem('cookiesAccepted', 'false');
+    cookieNotice.remove();
+  });
+}
