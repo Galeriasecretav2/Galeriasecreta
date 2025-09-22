@@ -1094,6 +1094,24 @@ function initializeButtons() {
     });
   }
 
+  // Botão "Voltar ao Topo"
+  const scrollToTopBtn = document.getElementById('scroll-to-top');
+  if (scrollToTopBtn) {
+    scrollToTopBtn.addEventListener('click', () => {
+      // Scroll suave para o topo da página
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      // Alternativa: scroll para a seção hero
+      // const heroSection = document.getElementById('home');
+      // if (heroSection) {
+      //   heroSection.scrollIntoView({ behavior: 'smooth' });
+      // }
+    });
+  }
+
   // Botões de contacto no perfil
   document.addEventListener('click', (e) => {
     if (e.target.id === 'profile-call') {
