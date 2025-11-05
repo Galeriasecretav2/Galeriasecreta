@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
-const crypto = require('crypto');
 
 // Configura upload local (temporário)
 const upload = multer({ dest: 'uploads/' });
@@ -59,15 +58,6 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Rate limiting para reset de senha
-const resetLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 3, // máximo 3 tentativas por IP
-  message: { error: 'Muitas tentativas de reset. Tente novamente em 15 minutos.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
 // Middleware para verificar JWT
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -99,18 +89,6 @@ const logLogin = async (email, usuarioId, sucesso, motivo, req) => {
   } catch (error) {
     console.error('Erro ao registrar log:', error);
   }
-};
-
-// Função para enviar email (simulação - você pode integrar com um serviço real)
-const enviarEmailReset = async (email, token, nome) => {
-  // Aqui você integraria com um serviço de email como SendGrid, Mailgun, etc.
-  // Por enquanto, vamos apenas logar o token para desenvolvimento
-  console.log(`📧 Email de reset para ${email}:`);
-  console.log(`🔗 Link de reset: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`);
-  console.log(`👤 Nome: ${nome}`);
-  
-  // Simular envio bem-sucedido
-  return Promise.resolve(true);
 };
 
 // Rota de registro
@@ -178,205 +156,6 @@ app.post('/api/registro', async (req, res) => {
     return res.status(500).json({ 
       error: 'Erro interno do servidor',
       detalhes: err.message 
-    });
-  }
-});
-
-// Rota para solicitar reset de senha
-app.post('/api/forgot-password', resetLimiter, async (req, res) => {
-  try {
-    console.log('📨 POST /api/forgot-password');
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ 
-        error: 'Email é obrigatório' 
-      });
-    }
-
-    // Buscar usuário
-    const { data: usuario, error } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    // Sempre retornar sucesso por segurança (não revelar se email existe)
-    if (error || !usuario) {
-      console.log('❌ Usuário não encontrado:', email);
-      return res.status(200).json({ 
-        message: 'Se o email existir em nosso sistema, você receberá instruções para redefinir sua senha.' 
-      });
-    }
-
-    // Verificar se usuário está ativo
-    if (!usuario.ativo) {
-      console.log('❌ Usuário inativo:', email);
-      return res.status(200).json({ 
-        message: 'Se o email existir em nosso sistema, você receberá instruções para redefinir sua senha.' 
-      });
-    }
-
-    // Gerar token de reset
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetExpira = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
-
-    // Salvar token no banco
-    const { error: updateError } = await supabase
-      .from('usuarios')
-      .update({ 
-        token_reset: resetToken,
-        token_reset_expira: resetExpira.toISOString()
-      })
-      .eq('id', usuario.id);
-
-    if (updateError) {
-      console.error('❌ Erro ao salvar token:', updateError);
-      return res.status(500).json({ 
-        error: 'Erro interno do servidor' 
-      });
-    }
-
-    // Enviar email
-    try {
-      await enviarEmailReset(email, resetToken, usuario.nome);
-      console.log('✅ Email de reset enviado para:', email);
-    } catch (emailError) {
-      console.error('❌ Erro ao enviar email:', emailError);
-      // Não falhar a requisição se o email não for enviado
-    }
-
-    return res.status(200).json({
-      message: 'Se o email existir em nosso sistema, você receberá instruções para redefinir sua senha.'
-    });
-  } catch (err) {
-    console.error('❌ Erro geral no forgot-password:', err);
-    return res.status(500).json({ 
-      error: 'Erro interno do servidor' 
-    });
-  }
-});
-
-// Rota para verificar token de reset
-app.get('/api/verify-reset-token/:token', async (req, res) => {
-  try {
-    console.log('📨 GET /api/verify-reset-token');
-    const { token } = req.params;
-
-    if (!token) {
-      return res.status(400).json({ 
-        error: 'Token é obrigatório' 
-      });
-    }
-
-    // Buscar usuário com o token
-    const { data: usuario, error } = await supabase
-      .from('usuarios')
-      .select('id, nome, email, token_reset_expira')
-      .eq('token_reset', token)
-      .single();
-
-    if (error || !usuario) {
-      return res.status(400).json({ 
-        error: 'Token inválido ou expirado' 
-      });
-    }
-
-    // Verificar se token não expirou
-    if (new Date(usuario.token_reset_expira) < new Date()) {
-      return res.status(400).json({ 
-        error: 'Token expirado' 
-      });
-    }
-
-    return res.status(200).json({
-      valid: true,
-      usuario: {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email
-      }
-    });
-  } catch (err) {
-    console.error('❌ Erro ao verificar token:', err);
-    return res.status(500).json({ 
-      error: 'Erro interno do servidor' 
-    });
-  }
-});
-
-// Rota para redefinir senha
-app.post('/api/reset-password', async (req, res) => {
-  try {
-    console.log('📨 POST /api/reset-password');
-    const { token, novaSenha } = req.body;
-
-    if (!token || !novaSenha) {
-      return res.status(400).json({ 
-        error: 'Token e nova senha são obrigatórios' 
-      });
-    }
-
-    if (novaSenha.length < 6) {
-      return res.status(400).json({ 
-        error: 'Nova senha deve ter pelo menos 6 caracteres' 
-      });
-    }
-
-    // Buscar usuário com o token
-    const { data: usuario, error } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('token_reset', token)
-      .single();
-
-    if (error || !usuario) {
-      return res.status(400).json({ 
-        error: 'Token inválido ou expirado' 
-      });
-    }
-
-    // Verificar se token não expirou
-    if (new Date(usuario.token_reset_expira) < new Date()) {
-      return res.status(400).json({ 
-        error: 'Token expirado' 
-      });
-    }
-
-    // Hash da nova senha
-    const novaSenhaHash = await bcrypt.hash(novaSenha, 12);
-
-    // Atualizar senha e limpar token
-    const { error: updateError } = await supabase
-      .from('usuarios')
-      .update({ 
-        senha_hash: novaSenhaHash,
-        token_reset: null,
-        token_reset_expira: null,
-        tentativas_login: 0,
-        bloqueado_ate: null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', usuario.id);
-
-    if (updateError) {
-      console.error('❌ Erro ao atualizar senha:', updateError);
-      return res.status(500).json({ 
-        error: 'Erro ao redefinir senha' 
-      });
-    }
-
-    // Log da redefinição
-    await logLogin(usuario.email, usuario.id, true, 'Senha redefinida com sucesso', req);
-
-    console.log('✅ Senha redefinida com sucesso para:', usuario.email);
-    return res.status(200).json({
-      message: 'Senha redefinida com sucesso!'
-    });
-  } catch (err) {
-    console.error('❌ Erro geral no reset-password:', err);
-    return res.status(500).json({ 
-      error: 'Erro interno do servidor' 
     });
   }
 });
@@ -665,46 +444,66 @@ app.post('/api/inscricao', async (req, res) => {
     const { 
       nome, 
       email, 
-      password
+      telefone, 
+      data_nascimento, 
+      genero, 
+      cidade, 
+      provincia, 
+      profissao, 
+      experiencia_anterior, 
+      motivacao, 
+      disponibilidade, 
+      termos_aceitos, 
+      newsletter 
     } = req.body;
 
     console.log('📄 Dados de inscrição recebidos:', req.body);
 
     // Validação de campos obrigatórios
-    if (!nome || !email || !password) {
+    if (!nome || !email || !telefone || !data_nascimento || !genero || !cidade || !provincia || !disponibilidade) {
       return res.status(400).json({ 
         error: 'Campos obrigatórios ausentes',
-        detalhes: 'Nome, email e palavra-passe são obrigatórios'
+        detalhes: 'Nome, email, telefone, data de nascimento, gênero, cidade, província e disponibilidade são obrigatórios'
       });
     }
 
-    // Verificar se email já existe
-    const { data: existingUser } = await supabase
-      .from('usuarios')
-      .select('id')
-      .eq('email', email)
-      .single();
+    // Validação de idade mínima
+    const birthDate = new Date(data_nascimento);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
 
-    if (existingUser) {
-      return res.status(409).json({
-        error: 'Email já cadastrado',
-        detalhes: 'Este email já está registrado no sistema'
+    if (age < 18) {
+      return res.status(400).json({
+        error: 'Idade insuficiente',
+        detalhes: 'É necessário ter pelo menos 18 anos para se inscrever'
       });
     }
 
-    // Hash da senha
-    const senhaHash = await bcrypt.hash(password, 12);
-
-    // Inserir usuário
-    const { data, error } = await supabase.from('usuarios').insert([
+    // Inserção no banco
+    const { data, error } = await supabase.from('inscricoes').insert([
       {
         nome,
         email,
-        senha_hash: senhaHash,
-        tipo_usuario: 'cliente',
-        ativo: true
-      }
-    ]).select().single();
+        telefone,
+        data_nascimento,
+        genero,
+        cidade,
+        provincia,
+        profissao: profissao || '',
+        experiencia_anterior: experiencia_anterior || false,
+        motivacao: motivacao || '',
+        disponibilidade,
+        termos_aceitos: termos_aceitos || true,
+        newsletter: newsletter || false,
+        status: 'pendente',
+        observacoes: '',
+      },
+    ]);
 
     if (error) {
       console.error('❌ Erro ao salvar inscrição:', error.message);
@@ -723,18 +522,10 @@ app.post('/api/inscricao', async (req, res) => {
       });
     }
 
-    // Log do registro
-    await logLogin(email, data.id, true, 'Registro realizado com sucesso', req);
-
     console.log('✅ Inscrição salva com sucesso');
     return res.status(200).json({
       message: 'Inscrição realizada com sucesso!',
-      usuario: {
-        id: data.id,
-        nome: data.nome,
-        email: data.email,
-        tipo_usuario: data.tipo_usuario
-      }
+      data,
     });
   } catch (err) {
     console.error('❌ Erro geral na inscrição:', err.message, err);
