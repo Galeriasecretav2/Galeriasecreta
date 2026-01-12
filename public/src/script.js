@@ -214,10 +214,7 @@ function initializeProfilesData() {
             location: 'Nampula',
             mainImage: 'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
             gallery: [
-                'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
-                'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400'
+               
             ],
             bio: 'Olá, sou a Sofia! Uma modelo profissional com 5 anos de experiência no ramo. Sou uma pessoa elegante, educada e sempre disposta a proporcionar momentos únicos e inesquecíveis. Valorizo a discrição, o respeito mútuo e a qualidade em todos os encontros. Adoro conversas interessantes, jantares sofisticados e experiências culturais.',
             services: [
@@ -227,7 +224,7 @@ function initializeProfilesData() {
                 { icon: '🏢', name: 'Eventos Corporativos', description: 'Reuniões de negócios e eventos empresariais' }
             ],
             specialties: ['Elegância', 'Discrição', 'Conversação', 'Etiqueta Social', 'Idiomas'],
-            whatsapp: 'https://wa.me/258865595417?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
+            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
             availability: '24/7'
         },
         isabella: {
@@ -235,12 +232,9 @@ function initializeProfilesData() {
             category: 'Modelo Experiente',
             age: '28 anos',
             location: 'Nampula',
-            mainImage: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
+            mainImage: 'https://i.postimg.cc/vm1HVVMZ/123997228-3627243123965219-2863826447702482559-o.jpg',
             gallery: [
-                'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
-                'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400'
+                
             ],
             bio: 'Sou a Isabella, uma acompanhante experiente que valoriza a autenticidade e a conexão genuína. Com formação em psicologia, ofereço não apenas beleza, mas também inteligência emocional e capacidade de adaptação a qualquer ambiente social. Sou apaixonada por arte, literatura e gastronomia.',
             services: [
@@ -250,7 +244,7 @@ function initializeProfilesData() {
                 { icon: '🌃', name: 'Vida Noturna', description: 'Bares sofisticados e ambientes exclusivos' }
             ],
             specialties: ['Psicologia', 'Arte', 'Gastronomia', 'Literatura', 'Empatia'],
-            whatsapp: '+258853131185',
+            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
             availability: 'Seg-Dom 18h-02h'
         },
         valentina: {
@@ -258,12 +252,9 @@ function initializeProfilesData() {
             category: 'Modelo Premium',
             age: '26 anos',
             location: 'Nampula',
-            mainImage: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400',
+            mainImage: 'https://i.postimg.cc/hGdjzdb1/143127941-421898882477563-1534463607340270020-o.jpg',
             gallery: [
-                'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
-                'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400'
+                
             ],
             bio: 'Olá, sou a Valentina! Modelo premium com experiência internacional. Falo fluentemente português, inglês e francês. Sou sofisticada, bem-educada e sempre impecavelmente apresentada. Adoro viajar, conhecer novas culturas e proporcionar experiências memoráveis aos meus clientes mais exigentes.',
             services: [
@@ -273,7 +264,7 @@ function initializeProfilesData() {
                 { icon: '💎', name: 'Experiências Luxury', description: 'Serviços premium e experiências únicas' }
             ],
             specialties: ['Multilíngue', 'Viagens', 'Luxo', 'Protocolo', 'Sofisticação'],
-            whatsapp: '+258853131185',
+            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
             availability: 'Sob consulta'
         },
         adriana: {
@@ -283,10 +274,7 @@ function initializeProfilesData() {
             location: 'Nampula',
             mainImage: 'https://i.postimg.cc/N0J5XXxz/236376192-3857235194382171-763223918932869912-n.jpg',
             gallery: [
-                'https://i.postimg.cc/N0J5XXxz/236376192-3857235194382171-763223918932869912-n.jpg',
-                'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
-                'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400'
+                
             ],
             bio: 'Sou a Adriana, jovem, vibrante e cheia de energia! Modelo exclusiva que adora aventuras e experiências novas. Sou espontânea, divertida e sempre trago alegria aos encontros. Adoro música, dança, praia e tudo que envolva diversão e descontração, sempre mantendo a elegância.',
             services: [
@@ -296,7 +284,7 @@ function initializeProfilesData() {
                 { icon: '🌅', name: 'Experiências Naturais', description: 'Passeios e atividades ao ar livre' }
             ],
             specialties: ['Juventude', 'Energia', 'Música', 'Dança', 'Aventura'],
-            whatsapp: '+258853131185',
+            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
             availability: 'Ter-Sáb 20h-04h'
         },
         camila: {
@@ -304,12 +292,9 @@ function initializeProfilesData() {
             category: 'Modelo VIP',
             age: '27 anos',
             location: 'Nampula',
-            mainImage: 'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
+            mainImage: 'https://i.postimg.cc/QNfkX26k/236757367-4188721321213616-458560518676334121-n.jpg',
             gallery: [
-                'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
-                'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400'
+                
             ],
             bio: 'Olá, sou a Camila! Modelo VIP com experiência em moda e publicidade. Sou carismática, inteligente e sempre bem-humorada. Tenho facilidade para me adaptar a qualquer situação social, desde jantares formais até eventos descontraídos. Valorizo a qualidade dos encontros e a satisfação dos meus clientes.',
             services: [
@@ -319,7 +304,7 @@ function initializeProfilesData() {
                 { icon: '🎯', name: 'Networking', description: 'Eventos profissionais e conexões de negócios' }
             ],
             specialties: ['Moda', 'Fotografia', 'Carisma', 'Networking', 'Versatilidade'],
-            whatsapp: '+258853131185',
+            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
             availability: 'Qua-Dom 19h-03h'
         },
         beatriz: {
@@ -327,12 +312,9 @@ function initializeProfilesData() {
             category: 'Modelo Elite',
             age: '29 anos',
             location: 'Nampula',
-            mainImage: 'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400',
+            mainImage: 'https://i.postimg.cc/xCWT0TbF/121973195-351310436287938-1918747329702667523-n.jpg',
             gallery: [
-                'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://i.postimg.cc/26Hm3Vqw/235028980-1158931497943394-4321605246009855057-n.jpg',
-                'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
-                'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400'
+                
             ],
             bio: 'Sou a Beatriz, modelo elite com vasta experiência e maturidade. Ofereço companhia refinada para homens de bom gosto que valorizam a excelência. Sou culta, elegante e possuo uma presença marcante. Especializo-me em encontros de alto nível, sempre priorizando a discrição e a qualidade.',
             services: [
@@ -342,7 +324,7 @@ function initializeProfilesData() {
                 { icon: '💼', name: 'Executivo Premium', description: 'Acompanhamento para executivos e empresários' }
             ],
             specialties: ['Elite', 'Maturidade', 'Refinamento', 'Discrição', 'Excelência'],
-            whatsapp: '+258853131185',
+            whatsapp: 'https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta',
             availability: 'Seg-Sex 18h-24h'
         }
     };
@@ -456,7 +438,7 @@ function openProfile(profileId) {
     const whatsappBtn = document.getElementById('profile-whatsapp');
     const whatsappMessage = encodeURIComponent(`Olá ${profile.name}! Vi o seu perfil na Galeria Secreta e gostaria de saber mais sobre os seus serviços. Estou interessado em marcar um encontro.`);
     const whatsappNumber = profile.whatsapp.replace(/[^\d]/g, ''); // Remove all non-digits
-    whatsappBtn.href = `https://wa.me/258865595417?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta}`;
+    whatsappBtn.href = `https://wa.me/258851551556?text=Olá!%20Tenho%20interesse%20na%20Galeria%20Secreta}`;
     
     // Add click tracking for WhatsApp button
     whatsappBtn.addEventListener('click', function(e) {
